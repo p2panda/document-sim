@@ -1,3 +1,6 @@
-import * as wasm from "hello-wasm-pack";
+import * as wasm from "document-viz-wasm";
 
-wasm.greet();
+let document = new wasm.Document();
+let id = document.add("sam", new Date().getMilliseconds(), []);
+id = document.add("sam", new Date().getMilliseconds(), [id]);
+console.log(document.sorted_operations());
