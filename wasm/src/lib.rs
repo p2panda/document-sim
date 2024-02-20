@@ -1,6 +1,7 @@
 mod utils;
 
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use namakemono::document::{Authored, Causal, CausalDocument, Hashable, Timestamped};
 use namakemono::hash::Hash;
@@ -15,6 +16,7 @@ use crate::utils::jserr;
 pub struct Operation {
     hash: Hash,
     public_key: PublicKey,
+    author_name: String,
     seq_num: u32,
     timestamp: u32,
     previous: Vec<Hash>,
@@ -72,12 +74,12 @@ impl Document {
     #[wasm_bindgen]
     pub fn add(
         &mut self,
-        name: String,
+        author_name: String,
         timestamp: u32,
         previous: JsValue,
     ) -> Result<String, JsValue> {
         let previous: Vec<Hash> = jserr!(serde_wasm_bindgen::from_value(previous));
-        let author = self.authors.entry(name.clone()).or_insert(Author {
+        let author = self.authors.entry(author_name.clone()).or_insert(Author {
             public_key: PrivateKey::new().public_key(),
             seq_num: 0,
         });
@@ -86,6 +88,7 @@ impl Document {
         let hash: Hash = Hash::new(&format!("{}{}", author.public_key, author.seq_num));
 
         let operation = Operation {
+            author_name,
             public_key: author.public_key,
             hash,
             seq_num: author.seq_num,
@@ -105,7 +108,13 @@ impl Document {
     }
 
     #[wasm_bindgen]
-    pub fn sorted_operations(&self) -> JsValue {
+    pub fn prune_before_depth_per_log(&mut self, depth: u32) -> JsValue {
+        let pruned = self.document.prune_before_depth_per_log(depth as usize);
+        serde_wasm_bindgen::to_value(&pruned).unwrap()
+    }
+
+    #[wasm_bindgen]
+    pub fn operations(&self) -> JsValue {
         let operations: Vec<&Operation> = self
             .document
             .operations()
@@ -114,6 +123,18 @@ impl Document {
             .collect();
 
         serde_wasm_bindgen::to_value(&operations).unwrap()
+    }
+
+    pub fn get(&self, hash: String) -> JsValue {
+        let hash = Hash::from_str(&hash).unwrap();
+        let operation = self.document.operations_unsorted().get(&hash);
+        serde_wasm_bindgen::to_value(&operation).unwrap()
+    }
+
+    #[wasm_bindgen]
+    pub fn tips(&self) -> JsValue {
+        let tips = self.document.tips();
+        serde_wasm_bindgen::to_value(&tips).unwrap()
     }
 }
 
