@@ -5,7 +5,8 @@ import Gradient from "javascript-color-gradient";
 import styles from "./style.css";
 
 cytoscape.use(dagre);
-let document = new wasm.Document();
+
+const DEPTH = 4;
 
 const gradientArray = new Gradient()
   .setColorGradient("#3F2CAF", "#e9446a", "#edc988", "#607D8B")
@@ -54,32 +55,75 @@ const initLog = (publicKey) => {
   window.LOGS[publicKey] = initGraph(publicKey);
 };
 
-const publish = (document, author, latency) => {
-  console.log(`${author} published an operation`);
-  const tips = document.tips();
+const broadcast = (operation, senderLatency) => {
+  for (const author of window.AUTHORS) {
+    const totalLatency =
+      operation.authorName === author.name ? 0 : senderLatency + author.latency;
+
+    setTimeout(() => {
+      const document = author.document;
+      document.add(operation);
+      document.pruneBeforeDepthPerLog(DEPTH);
+    }, totalLatency);
+  }
+};
+
+const publish = (authorName) => {
+  const author = window.AUTHORS.find((author) => author.name == authorName);
+  const document = author.document;
   const timestamp = new Date().getMilliseconds();
+  const id = document.create(authorName, timestamp);
+  const operation = document.get(id);
+  broadcast(operation, author.latency);
+  updateVisualization(operation);
+};
 
-  setTimeout(() => {
-    let id = document.add(author, timestamp, tips);
-    let operation = document.get(id);
-    addNode(operation);
-    addEdges(operation);
+const updateVisualization = (newOperation) => {
+  window.DOCUMENT.add(newOperation);
+  const pruned = window.DOCUMENT.pruneBeforeDepthPerLog(DEPTH);
 
-    pruneBeforeDepthPerLog(document, 4);
-
-    const sorted = window.document.querySelector("#sorted");
-    sorted.innerHTML = "";
-    for (const operation of document.operations()) {
-      const div = window.document.createElement("div");
-      div.style.backgroundColor =
-        gradientArray[operation.seqNum % gradientArray.length];
-      div.innerText = `${operation.authorName}_${operation.seqNum}`;
-      sorted.prepend(div);
+  const operations = window.DOCUMENT.operations();
+  let previousOperations = [];
+  for (const previous of newOperation.previous) {
+    const previousOperation = window.DOCUMENT.get(previous);
+    if (!previousOperation) {
+      continue;
     }
+    previousOperations.push(previousOperation.hash);
+  }
 
-    window.GRAPH.layout({
+  addNode(newOperation);
+  addEdges(newOperation, previousOperations, operations);
+  pruneGraphNodes(pruned);
+
+  const sorted = window.document.querySelector("#sorted");
+  sorted.innerHTML = "";
+  for (const operation of operations) {
+    const div = window.document.createElement("div");
+    div.style.backgroundColor =
+      gradientArray[operation.seqNum % gradientArray.length];
+    div.innerText = `${operation.authorName}_${operation.seqNum}`;
+    sorted.prepend(div);
+  }
+
+  window.GRAPH.layout({
+    name: "dagre",
+    animate: true,
+    animateFilter: function (node, i) {
+      if (node.data().isNew) {
+        node.data("isNew", false);
+        return false;
+      }
+      return true;
+    },
+  }).run();
+
+  window.LOGS[newOperation.publicKey]
+    .layout({
       name: "dagre",
       animate: true,
+      fit: false,
+      nodeDimensionsIncludeLabels: true,
       animateFilter: function (node, i) {
         if (node.data().isNew) {
           node.data("isNew", false);
@@ -87,24 +131,8 @@ const publish = (document, author, latency) => {
         }
         return true;
       },
-    }).run();
-
-    window.LOGS[operation.publicKey]
-      .layout({
-        name: "dagre",
-        animate: true,
-        fit: false,
-        nodeDimensionsIncludeLabels: true,
-        animateFilter: function (node, i) {
-          if (node.data().isNew) {
-            node.data("isNew", false);
-            return false;
-          }
-          return true;
-        },
-      })
-      .run();
-  }, latency);
+    })
+    .run();
 };
 
 const addNode = (operation) => {
@@ -134,12 +162,8 @@ const addNode = (operation) => {
   window.LOGS[operation.publicKey].add(node());
 };
 
-const addEdges = (operation) => {
-  for (const previous of operation.previous) {
-    if (!document.get(previous)) {
-      continue;
-    }
-
+const addEdges = (operation, previousOperations, allOperations) => {
+  for (const previous of previousOperations) {
     window.GRAPH.add({
       group: "edges",
       data: {
@@ -153,7 +177,7 @@ const addEdges = (operation) => {
     return;
   }
 
-  let backlink = Array.from(document.operations()).find(
+  let backlink = allOperations.find(
     (op) =>
       op.publicKey === operation.publicKey && op.seqNum === operation.seqNum - 1
   );
@@ -167,9 +191,7 @@ const addEdges = (operation) => {
   });
 };
 
-const pruneBeforeDepthPerLog = (document, depth) => {
-  let pruned = document.pruneBeforeDepthPerLog(depth);
-
+const pruneGraphNodes = (pruned) => {
   for (const [author, operations] of pruned) {
     for (const hash of operations) {
       var node = window.GRAPH.$(`#${hash.slice(0, 4)}`);
@@ -180,9 +202,15 @@ const pruneBeforeDepthPerLog = (document, depth) => {
   }
 };
 
+window.DOCUMENT = new wasm.Document();
 window.GRAPH = initGraph("graph");
 window.LOGS = {};
+window.AUTHORS = [
+  { name: "anna", latency: 500, document: new wasm.Document() },
+  { name: "bobby", latency: 800, document: new wasm.Document() },
+  { name: "claire", latency: 2000, document: new wasm.Document() },
+];
 
-setInterval(publish, 2000, document, "anna", 300);
-setInterval(publish, 1400, document, "bobby", 200);
-setInterval(publish, 1200, document, "claire", 100);
+setInterval(publish, 1000, "anna");
+setInterval(publish, 5000, "bobby");
+setInterval(publish, 4000, "claire");

@@ -77,11 +77,19 @@ impl Document {
     #[wasm_bindgen]
     pub fn add(
         &mut self,
+        operation: JsValue,
+    ) -> Result<(), JsValue> {
+        let operation: Operation = jserr!(serde_wasm_bindgen::from_value(operation));
+        let _ignored = self.document.add(&[operation]);
+        Ok(())
+    }
+
+    #[wasm_bindgen]
+    pub fn create(
+        &mut self,
         author_name: String,
         timestamp: u32,
-        previous: JsValue,
     ) -> Result<String, JsValue> {
-        let previous: Vec<Hash> = jserr!(serde_wasm_bindgen::from_value(previous));
         let author = self.authors.entry(author_name.clone()).or_insert(Author {
             public_key: PrivateKey::new().public_key(),
             seq_num: 0,
@@ -96,7 +104,7 @@ impl Document {
             hash,
             seq_num: author.seq_num,
             timestamp,
-            previous,
+            previous: self.document.tips().into_iter().cloned().collect(),
         };
 
         let _ignored = self.document.add(&[operation]);
