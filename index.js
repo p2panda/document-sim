@@ -44,6 +44,15 @@ const initGraph = (el) => {
   });
 };
 
+const initLog = (publicKey) => {
+  const container = window.document.querySelector("#container");
+  const logDiv = window.document.createElement("div");
+  logDiv.id = publicKey;
+  logDiv.classList.add("log");
+  container.prepend(logDiv);
+  window.LOGS[publicKey] = initGraph(publicKey);
+};
+
 const publish = (document, author, latency) => {
   console.log(`${author} published an operation`);
   const tips = document.tips();
