@@ -15,8 +15,11 @@ use crate::utils::jserr;
 #[wasm_bindgen]
 pub struct Operation {
     hash: Hash,
+    #[serde(rename = "publicKey")]
     public_key: PublicKey,
+    #[serde(rename = "authorName")]
     author_name: String,
+    #[serde(rename = "seqNum")]
     seq_num: u32,
     timestamp: u32,
     previous: Vec<Hash>,
@@ -101,13 +104,13 @@ impl Document {
         Ok(hash.to_hex().into())
     }
 
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = pruneBeforeTimestamp)]
     pub fn prune_before_timestamp(&mut self, timestamp: u32) -> JsValue {
         let pruned = self.document.prune_before_timestamp(timestamp as u64);
         serde_wasm_bindgen::to_value(&pruned).unwrap()
     }
 
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = pruneBeforeDepthPerLog)]
     pub fn prune_before_depth_per_log(&mut self, depth: u32) -> JsValue {
         let pruned = self.document.prune_before_depth_per_log(depth as usize);
         serde_wasm_bindgen::to_value(&pruned).unwrap()

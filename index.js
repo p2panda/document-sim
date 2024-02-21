@@ -72,8 +72,8 @@ const publish = (document, author, latency) => {
     for (const operation of document.operations()) {
       const div = window.document.createElement("div");
       div.style.backgroundColor =
-        gradientArray[operation.seq_num % gradientArray.length];
-      div.innerText = `${operation.author_name}_${operation.seq_num}`;
+        gradientArray[operation.seqNum % gradientArray.length];
+      div.innerText = `${operation.authorName}_${operation.seqNum}`;
       sorted.prepend(div);
     }
 
@@ -89,7 +89,7 @@ const publish = (document, author, latency) => {
       },
     }).run();
 
-    window.LOGS[operation.public_key]
+    window.LOGS[operation.publicKey]
       .layout({
         name: "dagre",
         animate: true,
@@ -113,13 +113,13 @@ const addNode = (operation) => {
       group: "nodes",
       grabbable: false,
       data: {
-        label: `${operation.author_name}_${operation.seq_num}`,
+        label: `${operation.authorName}_${operation.seqNum}`,
         id: operation.hash.slice(0, 4),
         isNew: true,
       },
       style: {
         "background-color":
-          gradientArray[operation.seq_num % gradientArray.length],
+          gradientArray[operation.seqNum % gradientArray.length],
       },
     };
   };
@@ -127,11 +127,11 @@ const addNode = (operation) => {
   const graphNode = node();
   window.GRAPH.add(graphNode);
 
-  if (!window.LOGS[operation.public_key]) {
-    initLog(operation.public_key);
+  if (!window.LOGS[operation.publicKey]) {
+    initLog(operation.publicKey);
   }
 
-  window.LOGS[operation.public_key].add(node());
+  window.LOGS[operation.publicKey].add(node());
 };
 
 const addEdges = (operation) => {
@@ -149,17 +149,16 @@ const addEdges = (operation) => {
     });
   }
 
-  if (operation.seq_num == 1) {
+  if (operation.seqNum == 1) {
     return;
   }
 
   let backlink = Array.from(document.operations()).find(
     (op) =>
-      op.public_key === operation.public_key &&
-      op.seq_num === operation.seq_num - 1
+      op.publicKey === operation.publicKey && op.seqNum === operation.seqNum - 1
   );
 
-  window.LOGS[operation.public_key].add({
+  window.LOGS[operation.publicKey].add({
     group: "edges",
     data: {
       source: backlink.hash.slice(0, 4),
@@ -169,7 +168,7 @@ const addEdges = (operation) => {
 };
 
 const pruneBeforeDepthPerLog = (document, depth) => {
-  let pruned = document.prune_before_depth_per_log(depth);
+  let pruned = document.pruneBeforeDepthPerLog(depth);
 
   for (const [author, operations] of pruned) {
     for (const hash of operations) {
