@@ -2,6 +2,7 @@ import * as wasm from "document-viz-wasm";
 import cytoscape from "cytoscape";
 import dagre from "cytoscape-dagre";
 import Gradient from "javascript-color-gradient";
+import styles from "./style.css";
 
 cytoscape.use(dagre);
 let document = new wasm.Document();
@@ -131,15 +132,6 @@ const addNode = (operation) => {
   }
 
   window.LOGS[operation.public_key].add(node());
-};
-
-const initLog = (publicKey) => {
-  const container = window.document.querySelector("#container");
-  const logDiv = window.document.createElement("div");
-  logDiv.id = publicKey;
-  logDiv.classList.add("log");
-  container.prepend(logDiv);
-  window.LOGS[publicKey] = initGraph(publicKey);
 };
 
 const addEdges = (operation) => {
