@@ -53,32 +53,40 @@ const initLog = (publicKey) => {
   window.LOGS[publicKey] = initGraph(publicKey);
 };
 
-const broadcast = (operation, senderLatency) => {
-  for (const name in window.AUTHORS) {
-    const author = window.AUTHORS[name];
-    const totalLatency =
-      operation.authorName === author.name ? 0 : senderLatency + author.latency;
+const broadcast = (sender, receivers) => {
+  for (const name in receivers) {
+    const receiver = receivers[name];
+    if (sender.name === receiver.name) {
+      continue;
+    }
+
+    if (!sender.online || !receiver.online) {
+      continue;
+    }
+
+    const totalLatency = sender.latency + receiver.latency;
 
     setTimeout(() => {
-      const document = author.document;
-      document.add(operation);
-      document.pruneBeforeDepthPerLog(DEPTH);
+      receiver.document.add(sender.document.operations());
+      receiver.document.pruneBeforeDepthPerLog(DEPTH);
     }, totalLatency);
   }
 };
 
 const publish = (author) => {
   console.log("publish: ", author);
-  const document = author.document;
   const timestamp = new Date().getMilliseconds();
-  const id = document.create(author.name, timestamp);
-  const operation = document.get(id);
-  broadcast(operation, author.latency);
+  // creates and adds operation to the document.
+  const id = author.document.create(author.name, timestamp);
+  author.document.pruneBeforeDepthPerLog(DEPTH);
+  broadcast(author, window.AUTHORS);
+
+  const operation = author.document.get(id);
   updateVisualization(operation);
 };
 
 const updateVisualization = (newOperation) => {
-  window.DOCUMENT.add(newOperation);
+  window.DOCUMENT.add([newOperation]);
   const pruned = window.DOCUMENT.pruneBeforeDepthPerLog(DEPTH);
 
   const operations = window.DOCUMENT.operations();
@@ -209,18 +217,21 @@ const init = () => {
   window.AUTHORS = {
     anna: {
       name: "anna",
+      online: true,
       latency: 0,
       interval: 800,
       document: new wasm.Document(),
     },
     bobby: {
       name: "bobby",
+      online: true,
       latency: 0,
       interval: 2000,
       document: new wasm.Document(),
     },
     claire: {
       name: "claire",
+      online: true,
       latency: 0,
       interval: 10000,
       document: new wasm.Document(),
@@ -228,19 +239,7 @@ const init = () => {
   };
 };
 
-const reset = () => {
-  window.DOCUMENT = new wasm.Document();
-  window.GRAPH = initGraph("graph");
-  window.LOGS = {};
-  for (const author in window.AUTHORS) {
-    window.AUTHORS[author].document = new wasm.Document();
-  }
-  window.document.querySelector("#logs").innerHTML = "";
-  window.document.querySelector("#sorted").innerHTML = "";
-};
-
 const run = () => {
-  reset();
   const anna = window.AUTHORS["anna"];
   window.ANNA = setInterval(publish, anna["interval"], anna);
   const bobby = window.AUTHORS["bobby"];
@@ -258,9 +257,6 @@ const stop = () => {
 const stopButton = window.document.querySelector("#stop");
 stopButton.onclick = (e) => {
   e.target.disabled = true;
-  window.document.querySelectorAll("input").forEach((input) => {
-    input.disabled = false;
-  });
   window.document.querySelector("#go").disabled = false;
   stop();
 };
@@ -268,9 +264,6 @@ stopButton.onclick = (e) => {
 const goButton = window.document.querySelector("#go");
 goButton.onclick = (e) => {
   e.target.disabled = true;
-  window.document.querySelectorAll("input").forEach((input) => {
-    input.disabled = true;
-  });
   window.document.querySelector("#stop").disabled = false;
   run();
 };
@@ -278,16 +271,23 @@ goButton.onclick = (e) => {
 init();
 
 for (const name in window.AUTHORS) {
+  const author = window.AUTHORS[name];
   const controls = document.querySelector(`#${name}`);
   const latency = controls.querySelector("input[name=latency]");
-  console.log(latency);
-  latency.value = window.AUTHORS[name].latency;
-  const interval = controls.querySelector("input[name=interval]");
-  interval.value = window.AUTHORS[name].interval;
+  latency.value = author.latency;
   latency.onchange = (e) => {
-    window.AUTHORS[name].latency = e.target.value;
+    author.latency = e.target.value;
   };
+  const interval = controls.querySelector("input[name=interval]");
+  interval.value = author.interval;
   interval.onchange = (e) => {
-    window.AUTHORS[name].interval = e.target.value;
+    author.interval = e.target.value;
+    clearInterval(window[name]);
+    window[name] = setInterval(publish, author.interval, author);
+  };
+  const online = controls.querySelector("input[name=online]");
+  online.checked = author.online;
+  online.onchange = (e) => {
+    author.online = e.target.checked;
   };
 }

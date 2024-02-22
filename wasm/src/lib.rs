@@ -79,8 +79,8 @@ impl Document {
         &mut self,
         operation: JsValue,
     ) -> Result<(), JsValue> {
-        let operation: Operation = jserr!(serde_wasm_bindgen::from_value(operation));
-        let _ignored = self.document.add(&[operation]);
+        let operations: Vec<Operation> = jserr!(serde_wasm_bindgen::from_value(operation));
+        let ignored = self.document.add(&operations);
         Ok(())
     }
 
