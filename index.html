@@ -8,8 +8,34 @@
 
 <body>
   <div id="container">
+    <div id="logs"></div>
     <div id="graph"></div>
     <div id="sorted"></div>
+    <div id="controls">
+      <button disabled="true" id="stop">stop</button>
+      <button id="go">go</button>
+      <div id="anna">
+        <h2>Anna</h2>
+        <label for="latency">Latency</label>
+        <input name="latency" type="number" min="0" max="5000">
+        <label for="interval">Interval</label>
+        <input name="interval" type="number" min="0" max="10000">
+      </div>
+      <div id="bobby">
+        <h2>Bobby</h2>
+        <label for="latency">Latency</label>
+        <input name="latency" type="number" min="0" max="5000">
+        <label for="interval">Interval</label>
+        <input name="interval" type="number" min="0" max="10000">
+      </div>
+      <div id="claire">
+        <h2>Claire</h2>
+        <label for="latency">Latency</label>
+        <input name="latency" type="number" min="0" max="5000">
+        <label for="interval">Interval</label>
+        <input name="interval" type="number" min="0" max="10000">
+      </div>
+    </div>
   </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>

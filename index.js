@@ -6,8 +6,6 @@ import styles from "./style.css";
 
 cytoscape.use(dagre);
 
-const DEPTH = 4;
-
 const gradientArray = new Gradient()
   .setColorGradient("#3F2CAF", "#e9446a", "#edc988", "#607D8B")
   .setMidpoint(20)
@@ -15,7 +13,7 @@ const gradientArray = new Gradient()
 
 const initGraph = (el) => {
   return cytoscape({
-    container: window.document.getElementById(el), // container to render in
+    container: document.getElementById(el), // container to render in
     elements: [],
     style: [
       // the stylesheet for the graph
@@ -47,8 +45,8 @@ const initGraph = (el) => {
 };
 
 const initLog = (publicKey) => {
-  const container = window.document.querySelector("#container");
-  const logDiv = window.document.createElement("div");
+  const container = document.querySelector("#logs");
+  const logDiv = document.createElement("div");
   logDiv.id = publicKey;
   logDiv.classList.add("log");
   container.prepend(logDiv);
@@ -56,7 +54,8 @@ const initLog = (publicKey) => {
 };
 
 const broadcast = (operation, senderLatency) => {
-  for (const author of window.AUTHORS) {
+  for (const name in window.AUTHORS) {
+    const author = window.AUTHORS[name];
     const totalLatency =
       operation.authorName === author.name ? 0 : senderLatency + author.latency;
 
@@ -68,11 +67,11 @@ const broadcast = (operation, senderLatency) => {
   }
 };
 
-const publish = (authorName) => {
-  const author = window.AUTHORS.find((author) => author.name == authorName);
+const publish = (author) => {
+  console.log("publish: ", author);
   const document = author.document;
   const timestamp = new Date().getMilliseconds();
-  const id = document.create(authorName, timestamp);
+  const id = document.create(author.name, timestamp);
   const operation = document.get(id);
   broadcast(operation, author.latency);
   updateVisualization(operation);
@@ -96,10 +95,10 @@ const updateVisualization = (newOperation) => {
   addEdges(newOperation, previousOperations, operations);
   pruneGraphNodes(pruned);
 
-  const sorted = window.document.querySelector("#sorted");
+  const sorted = document.querySelector("#sorted");
   sorted.innerHTML = "";
   for (const operation of operations) {
-    const div = window.document.createElement("div");
+    const div = document.createElement("div");
     div.style.backgroundColor =
       gradientArray[operation.seqNum % gradientArray.length];
     div.innerText = `${operation.authorName}_${operation.seqNum}`;
@@ -202,15 +201,93 @@ const pruneGraphNodes = (pruned) => {
   }
 };
 
-window.DOCUMENT = new wasm.Document();
-window.GRAPH = initGraph("graph");
-window.LOGS = {};
-window.AUTHORS = [
-  { name: "anna", latency: 500, document: new wasm.Document() },
-  { name: "bobby", latency: 800, document: new wasm.Document() },
-  { name: "claire", latency: 2000, document: new wasm.Document() },
-];
+const init = () => {
+  window.DEPTH = 4;
+  window.DOCUMENT = new wasm.Document();
+  window.GRAPH = initGraph("graph");
+  window.LOGS = {};
+  window.AUTHORS = {
+    anna: {
+      name: "anna",
+      latency: 0,
+      interval: 800,
+      document: new wasm.Document(),
+    },
+    bobby: {
+      name: "bobby",
+      latency: 0,
+      interval: 2000,
+      document: new wasm.Document(),
+    },
+    claire: {
+      name: "claire",
+      latency: 0,
+      interval: 10000,
+      document: new wasm.Document(),
+    },
+  };
+};
 
-setInterval(publish, 1000, "anna");
-setInterval(publish, 5000, "bobby");
-setInterval(publish, 4000, "claire");
+const reset = () => {
+  window.DOCUMENT = new wasm.Document();
+  window.GRAPH = initGraph("graph");
+  window.LOGS = {};
+  for (const author in window.AUTHORS) {
+    window.AUTHORS[author].document = new wasm.Document();
+  }
+  window.document.querySelector("#logs").innerHTML = "";
+  window.document.querySelector("#sorted").innerHTML = "";
+};
+
+const run = () => {
+  reset();
+  const anna = window.AUTHORS["anna"];
+  window.ANNA = setInterval(publish, anna["interval"], anna);
+  const bobby = window.AUTHORS["bobby"];
+  window.BOBBY = setInterval(publish, bobby["interval"], bobby);
+  const claire = window.AUTHORS["claire"];
+  window.CLAIRE = setInterval(publish, claire["interval"], claire);
+};
+
+const stop = () => {
+  clearInterval(window.ANNA);
+  clearInterval(window.BOBBY);
+  clearInterval(window.CLAIRE);
+};
+
+const stopButton = window.document.querySelector("#stop");
+stopButton.onclick = (e) => {
+  e.target.disabled = true;
+  window.document.querySelectorAll("input").forEach((input) => {
+    input.disabled = false;
+  });
+  window.document.querySelector("#go").disabled = false;
+  stop();
+};
+
+const goButton = window.document.querySelector("#go");
+goButton.onclick = (e) => {
+  e.target.disabled = true;
+  window.document.querySelectorAll("input").forEach((input) => {
+    input.disabled = true;
+  });
+  window.document.querySelector("#stop").disabled = false;
+  run();
+};
+
+init();
+
+for (const name in window.AUTHORS) {
+  const controls = document.querySelector(`#${name}`);
+  const latency = controls.querySelector("input[name=latency]");
+  console.log(latency);
+  latency.value = window.AUTHORS[name].latency;
+  const interval = controls.querySelector("input[name=interval]");
+  interval.value = window.AUTHORS[name].interval;
+  latency.onchange = (e) => {
+    window.AUTHORS[name].latency = e.target.value;
+  };
+  interval.onchange = (e) => {
+    window.AUTHORS[name].interval = e.target.value;
+  };
+}
