@@ -3,7 +3,9 @@ import cytoscape from "cytoscape";
 import dagre from "cytoscape-dagre";
 import Gradient from "javascript-color-gradient";
 import styles from "./style.css";
+import { defineCustomElements } from "document-viz-components-loader";
 
+defineCustomElements();
 cytoscape.use(dagre);
 
 const gradientArray = new Gradient()

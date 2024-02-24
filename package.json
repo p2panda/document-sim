@@ -1,10 +1,12 @@
 {
   "name": "nama-document-viz",
   "version": "0.1.0",
-  "description": "visualize namakemono document simulations in the browser",
+  "description": "Visualize namakemono document simulations in the browser",
   "main": "index.js",
   "scripts": {
-    "build": "wasm-pack build ./wasm && webpack --config webpack.config.js",
+    "build-wasm": "wasm-pack build ./wasm",
+    "build-components": "cd web-components && npm run build",
+    "build": "npm run build-wasm && npm run build-components && webpack --config webpack.config.js",
     "start": "webpack-dev-server"
   },
   "keywords": [
@@ -13,9 +15,10 @@
     "webassembly",
     "wasm",
     "rust",
+    "web-components",
     "webpack"
   ],
-  "license": "(MIT OR Apache-2.0)",
+  "license": "AGPL-3.0-only",
   "devDependencies": {
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.10.0",
@@ -28,6 +31,7 @@
     "cytoscape": "^3.28.1",
     "cytoscape-dagre": "^2.5.0",
     "document-viz-wasm": "file:wasm/pkg",
-    "javascript-color-gradient": "^2.4.4"
+    "javascript-color-gradient": "^2.4.4",
+    "document-viz-components-loader": "file:web-components/loader"
   }
 }
