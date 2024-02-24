@@ -1,0 +1,29 @@
+{
+  "name": "document-viz-components",
+  "version": "0.0.1",
+  "description": "Namakemono document visualization web components",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "es2015": "dist/esm/index.js",
+  "es2017": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/document-viz-components/document-viz-components.esm.js",
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve",
+    "generate": "stencil generate"
+  },
+  "dependencies": {
+    "@stencil/core": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.11"
+  }
+}
