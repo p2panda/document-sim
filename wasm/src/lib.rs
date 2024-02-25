@@ -12,17 +12,46 @@ use wasm_bindgen::prelude::*;
 use crate::utils::jserr;
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug, PartialOrd, Ord, Hash)]
-#[wasm_bindgen]
+#[wasm_bindgen(inspectable, getter_with_clone)]
 pub struct Operation {
     hash: Hash,
-    #[serde(rename = "publicKey")]
     public_key: PublicKey,
-    #[serde(rename = "authorName")]
     author_name: String,
-    #[serde(rename = "seqNum")]
     seq_num: u32,
     timestamp: u32,
+    backlink: Option<Hash>,
     previous: Vec<Hash>,
+}
+
+#[wasm_bindgen]
+impl Operation {
+    pub fn hash(&self) -> String {
+        self.hash().to_string()
+    }
+
+    pub fn publicKey(&self) -> String {
+        self.public_key().to_string()
+    }
+
+    pub fn authorName(&self) -> String {
+        self.author_name.to_owned()
+    }
+
+    pub fn seqNum(&self) -> i32 {
+        self.seq_num() as i32
+    }
+
+    pub fn timestamp(&self) -> i32 {
+        self.timestamp() as i32
+    }
+
+    pub fn backlink(&self) -> Option<String> {
+        self.backlink().map(|hash| hash.to_string())
+    }
+
+    pub fn previous(&self) -> Vec<String> {
+        self.previous().iter().map(|hash| hash.to_string()).collect()
+    }
 }
 
 impl Authored for Operation {
@@ -75,26 +104,25 @@ impl Document {
     }
 
     #[wasm_bindgen]
-    pub fn add(
-        &mut self,
-        operation: JsValue,
-    ) -> Result<(), JsValue> {
+    pub fn add(&mut self, operation: JsValue) -> Result<(), JsValue> {
         let operations: Vec<Operation> = jserr!(serde_wasm_bindgen::from_value(operation));
         let ignored = self.document.add(&operations);
         Ok(())
     }
 
     #[wasm_bindgen]
-    pub fn create(
-        &mut self,
-        author_name: String,
-        timestamp: u32,
-    ) -> Result<String, JsValue> {
+    pub fn create(&mut self, author_name: String, timestamp: u32) -> Result<String, JsValue> {
         let author = self.authors.entry(author_name.clone()).or_insert(Author {
             public_key: PrivateKey::new().public_key(),
             seq_num: 0,
         });
-        author.seq_num += 1;
+
+        let backlink = if author.seq_num == 0 {
+            None
+        } else {
+            let log = self.document.logs().get(&author.public_key).unwrap();
+            log.first().map(|(_, _, hash)| *hash)
+        };
 
         let hash: Hash = Hash::new(&format!("{}{}", author.public_key, author.seq_num));
 
@@ -104,10 +132,13 @@ impl Document {
             hash,
             seq_num: author.seq_num,
             timestamp,
+            backlink,
             previous: self.document.tips().into_iter().cloned().collect(),
         };
 
         let _ignored = self.document.add(&[operation]);
+
+        author.seq_num += 1;
 
         Ok(hash.to_hex().into())
     }

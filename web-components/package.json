@@ -21,9 +21,17 @@
     "generate": "stencil generate"
   },
   "dependencies": {
-    "@stencil/core": "^4.7.0"
+    "@stencil/core": "^4.7.0",
+    "cytoscape": "^3.28.1",
+    "cytoscape-dagre": "^2.5.0",
+    "document-viz-wasm": "file:../wasm/pkg",
+    "javascript-color-gradient": "^2.4.4"
   },
   "devDependencies": {
+    "@rollup/plugin-wasm": "^6.2.2",
+    "@types/cytoscape": "^3.19.16",
+    "@types/cytoscape-dagre": "^2.3.3",
+    "@types/document-viz-wasm": "file:../wasm/pkg",
     "@types/node": "^16.18.11"
   }
 }
