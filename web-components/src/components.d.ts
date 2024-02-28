@@ -6,56 +6,43 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface MyComponent {
+    interface NamaLogViz {
+        "addNode": (id: string, seqNum: number, previous?: string) => Promise<void>;
         /**
-          * The first name
+          * The log authors name
          */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
+        "author": string;
+        "layout": () => Promise<void>;
+        "prune": (id: string) => Promise<void>;
     }
 }
 declare global {
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    interface HTMLNamaLogVizElement extends Components.NamaLogViz, HTMLStencilElement {
     }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
+    var HTMLNamaLogVizElement: {
+        prototype: HTMLNamaLogVizElement;
+        new (): HTMLNamaLogVizElement;
     };
     interface HTMLElementTagNameMap {
-        "my-component": HTMLMyComponentElement;
+        "nama-log-viz": HTMLNamaLogVizElement;
     }
 }
 declare namespace LocalJSX {
-    interface MyComponent {
+    interface NamaLogViz {
         /**
-          * The first name
+          * The log authors name
          */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
+        "author"?: string;
     }
     interface IntrinsicElements {
-        "my-component": MyComponent;
+        "nama-log-viz": NamaLogViz;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;
         }
     }
 }

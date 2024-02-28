@@ -10,7 +10,7 @@ import dagre from 'cytoscape-dagre';
 })
 export class NamaLogViz {
   /**
-   * The name of this logs author
+   * The log authors name
    */
   @Prop() author: string;
 

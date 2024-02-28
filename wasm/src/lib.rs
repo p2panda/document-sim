@@ -7,50 +7,61 @@ use namakemono::document::{Authored, Causal, CausalDocument, Hashable, Timestamp
 use namakemono::hash::Hash;
 use namakemono::identity::{PrivateKey, PublicKey};
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::convert::{IntoWasmAbi, RefFromWasmAbi};
 use wasm_bindgen::prelude::*;
 
 use crate::utils::jserr;
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug, PartialOrd, Ord, Hash)]
-#[wasm_bindgen(inspectable, getter_with_clone)]
+#[wasm_bindgen]
 pub struct Operation {
     hash: Hash,
     public_key: PublicKey,
     author_name: String,
-    seq_num: u32,
+    seq_num: u64,
     timestamp: u32,
     backlink: Option<Hash>,
     previous: Vec<Hash>,
 }
 
 #[wasm_bindgen]
+pub struct Operations(Vec<Operation>);
+
+#[wasm_bindgen]
 impl Operation {
+    #[wasm_bindgen]
     pub fn hash(&self) -> String {
-        self.hash().to_string()
+        self.hash.to_string()
     }
 
+    #[wasm_bindgen]
     pub fn publicKey(&self) -> String {
-        self.public_key().to_string()
+        self.public_key.to_string()
     }
 
-    pub fn authorName(&self) -> String {
+    #[wasm_bindgen(js_name = authorName)]
+    pub fn author_name(&self) -> String {
         self.author_name.to_owned()
     }
 
+    #[wasm_bindgen]
     pub fn seqNum(&self) -> i32 {
-        self.seq_num() as i32
+        self.seq_num as i32
     }
 
+    #[wasm_bindgen]
     pub fn timestamp(&self) -> i32 {
-        self.timestamp() as i32
+        self.timestamp as i32
     }
 
+    #[wasm_bindgen]
     pub fn backlink(&self) -> Option<String> {
-        self.backlink().map(|hash| hash.to_string())
+        self.backlink.map(|hash| hash.to_string())
     }
 
+    #[wasm_bindgen]
     pub fn previous(&self) -> Vec<String> {
-        self.previous().iter().map(|hash| hash.to_string()).collect()
+        self.previous.iter().map(|hash| hash.to_string()).collect()
     }
 }
 
@@ -90,7 +101,6 @@ pub struct Document {
 
 struct Author {
     public_key: PublicKey,
-    seq_num: u32,
 }
 
 #[wasm_bindgen]
@@ -104,43 +114,44 @@ impl Document {
     }
 
     #[wasm_bindgen]
-    pub fn add(&mut self, operation: JsValue) -> Result<(), JsValue> {
-        let operations: Vec<Operation> = jserr!(serde_wasm_bindgen::from_value(operation));
-        let ignored = self.document.add(&operations);
-        Ok(())
+    pub fn add(&mut self, operation: &Operation) -> Result<Vec<Operation>, JsValue> {
+        let ignored = self.document.add(&vec![operation.to_owned()]);
+        Ok(ignored)
     }
 
     #[wasm_bindgen]
-    pub fn create(&mut self, author_name: String, timestamp: u32) -> Result<String, JsValue> {
+    pub fn create(
+        &mut self,
+        author_name: String,
+        seq_num: u32,
+        timestamp: u32,
+    ) -> Result<Operation, JsValue> {
         let author = self.authors.entry(author_name.clone()).or_insert(Author {
             public_key: PrivateKey::new().public_key(),
-            seq_num: 0,
         });
 
-        let backlink = if author.seq_num == 0 {
+        let backlink = if seq_num == 0 {
             None
         } else {
             let log = self.document.logs().get(&author.public_key).unwrap();
-            log.first().map(|(_, _, hash)| *hash)
+            log.iter().find(|(s, _, _)| *s == (seq_num  - 1) as u64)
         };
 
-        let hash: Hash = Hash::new(&format!("{}{}", author.public_key, author.seq_num));
+        let hash: Hash = Hash::new(&format!("{}{}", author.public_key, seq_num));
 
         let operation = Operation {
             author_name,
             public_key: author.public_key,
             hash,
-            seq_num: author.seq_num,
+            seq_num: seq_num as u64,
             timestamp,
-            backlink,
+            backlink: backlink.map(|(_, _, hash)| *hash),
             previous: self.document.tips().into_iter().cloned().collect(),
         };
 
-        let _ignored = self.document.add(&[operation]);
+        let _ignored = self.document.add(&[operation.clone()]);
 
-        author.seq_num += 1;
-
-        Ok(hash.to_hex().into())
+        Ok(operation)
     }
 
     #[wasm_bindgen(js_name = pruneBeforeTimestamp)]
@@ -156,21 +167,27 @@ impl Document {
     }
 
     #[wasm_bindgen]
-    pub fn operations(&self) -> JsValue {
-        let operations: Vec<&Operation> = self
+    pub fn operations(&self) -> Vec<Operation> {
+        let operations: Vec<Operation> = self
             .document
             .operations()
             .into_iter()
-            .map(|hash| self.document.operations_unsorted().get(hash).unwrap())
+            .map(|hash| {
+                self.document
+                    .operations_unsorted()
+                    .get(hash)
+                    .unwrap()
+                    .to_owned()
+            })
             .collect();
 
-        serde_wasm_bindgen::to_value(&operations).unwrap()
+        operations
     }
 
-    pub fn get(&self, hash: String) -> JsValue {
+    #[wasm_bindgen]
+    pub fn get(&self, hash: String) -> Option<Operation> {
         let hash = Hash::from_str(&hash).unwrap();
-        let operation = self.document.operations_unsorted().get(&hash);
-        serde_wasm_bindgen::to_value(&operation).unwrap()
+        self.document.operations_unsorted().get(&hash).cloned()
     }
 
     #[wasm_bindgen]

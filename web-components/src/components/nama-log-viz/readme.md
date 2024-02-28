@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property | Attribute | Description                  | Type     | Default     |
-| -------- | --------- | ---------------------------- | -------- | ----------- |
-| `author` | `author`  | The name of this logs author | `string` | `undefined` |
+| Property | Attribute | Description          | Type     | Default     |
+| -------- | --------- | -------------------- | -------- | ----------- |
+| `author` | `author`  | The log authors name | `string` | `undefined` |
 
 
 ## Methods

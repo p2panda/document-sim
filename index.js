@@ -1,15 +1,16 @@
-import * as wasm from 'document-viz-wasm';
-import cytoscape from 'cytoscape';
-import dagre from 'cytoscape-dagre';
-import Gradient from 'javascript-color-gradient';
-import styles from './style.css';
-import { defineCustomElements } from 'document-viz-components-loader';
+import * as wasm from "document-viz-wasm";
+import { Operation, Document } from "document-viz-wasm";
+import cytoscape from "cytoscape";
+import dagre from "cytoscape-dagre";
+import Gradient from "javascript-color-gradient";
+import styles from "./style.css";
+import { defineCustomElements } from "document-viz-components-loader";
 
 defineCustomElements();
 cytoscape.use(dagre);
 
 const gradientArray = new Gradient()
-  .setColorGradient('#3F2CAF', '#e9446a', '#edc988', '#607D8B')
+  .setColorGradient("#3F2CAF", "#e9446a", "#edc988", "#607D8B")
   .setMidpoint(20)
   .getColors();
 
@@ -20,28 +21,28 @@ const initGraph = (el) => {
     style: [
       // the stylesheet for the graph
       {
-        selector: 'node',
+        selector: "node",
         style: {
-          'text-background-padding': 30,
+          "text-background-padding": 30,
           width: 40,
           height: 40,
-          label: 'data(label)',
+          label: "data(label)",
         },
       },
       {
-        selector: 'edge',
+        selector: "edge",
         style: {
           width: 3,
-          'line-color': '#ccc',
-          'source-arrow-color': '#ccc',
-          'source-arrow-shape': 'triangle',
-          'curve-style': 'bezier',
+          "line-color": "#ccc",
+          "source-arrow-color": "#ccc",
+          "source-arrow-shape": "triangle",
+          "curve-style": "bezier",
         },
       },
     ],
 
     layout: {
-      name: 'dagre',
+      name: "dagre",
     },
   });
 };
@@ -60,56 +61,60 @@ const broadcast = (sender, receivers) => {
     const totalLatency = sender.latency + receiver.latency;
 
     setTimeout(() => {
-      receiver.document.add(sender.document.operations());
+      for (const operation of sender.document.operations()) {
+        receiver.document.add(operation);
+      }
       receiver.document.pruneBeforeDepthPerLog(window.DEPTH);
     }, totalLatency);
   }
 };
 
 const publish = async (author) => {
-  console.log('publish: ', author);
   const timestamp = new Date().getMilliseconds();
   // creates and adds operation to the document.
-  const id = author.document.create(author.name, timestamp);
+  const operation = author.document.create(
+    author.name,
+    author.seqNum,
+    timestamp
+  );
+  author.seqNum += 1;
   author.document.pruneBeforeDepthPerLog(window.DEPTH);
   broadcast(author, window.AUTHORS);
-
-  const operation = author.document.get(id);
   await updateVisualization(operation);
 };
 
 const updateVisualization = async (newOperation) => {
-  window.DOCUMENT.add([newOperation]);
+  window.DOCUMENT.add(newOperation);
   const pruned = window.DOCUMENT.pruneBeforeDepthPerLog(window.DEPTH);
 
   let previousOperations = [];
-  for (const previous of newOperation.previous) {
+  for (const previous of newOperation.previous()) {
     const previousOperation = window.DOCUMENT.get(previous);
     if (!previousOperation) {
       continue;
     }
-    previousOperations.push(previousOperation.hash);
+    previousOperations.push(previousOperation.hash());
   }
 
   await addNode(newOperation, previousOperations, pruned);
 
-  const sorted = document.querySelector('#sorted');
-  sorted.innerHTML = '';
+  const sorted = document.querySelector("#sorted");
+  sorted.innerHTML = "";
   const operations = window.DOCUMENT.operations();
   for (const operation of operations) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.style.backgroundColor =
-      gradientArray[operation.seqNum % gradientArray.length];
-    div.innerText = `${operation.authorName}_${operation.seqNum}`;
+      gradientArray[operation.seqNum() % gradientArray.length];
+    div.innerText = `${operation.authorName()}_${operation.seqNum()}`;
     sorted.prepend(div);
   }
 
   window.GRAPH.layout({
-    name: 'dagre',
+    name: "dagre",
     animate: true,
     animateFilter: function (node, i) {
       if (node.data().isNew) {
-        node.data('isNew', false);
+        node.data("isNew", false);
         return false;
       }
       return true;
@@ -120,16 +125,16 @@ const updateVisualization = async (newOperation) => {
 const addNode = async (operation, previousOperations, pruned) => {
   const node = () => {
     return {
-      group: 'nodes',
+      group: "nodes",
       grabbable: false,
       data: {
-        label: `${operation.authorName}_${operation.seqNum}`,
-        id: operation.hash.slice(0, 4),
+        label: `${operation.authorName()}_${operation.seqNum()}`,
+        id: operation.hash(),
         isNew: true,
       },
       style: {
-        'background-color':
-          gradientArray[operation.seqNum % gradientArray.length],
+        "background-color":
+          gradientArray[operation.seqNum() % gradientArray.length],
       },
     };
   };
@@ -139,81 +144,83 @@ const addNode = async (operation, previousOperations, pruned) => {
 
   for (const previous of previousOperations) {
     window.GRAPH.add({
-      group: 'edges',
+      group: "edges",
       data: {
-        source: previous.slice(0, 4),
-        target: operation.hash.slice(0, 4),
+        source: previous,
+        target: operation.hash(),
       },
     });
   }
 
   for (const [publicKey, operations] of pruned) {
     for (const hash of operations) {
-      const n = window.GRAPH.$(`#${hash.slice(0, 4)}`);
+      const n = window.GRAPH.$(`#${hash}`);
       window.GRAPH.remove(n);
     }
   }
 
-  const { publicKey, hash, seqNum, authorName, backlink } = operation;
-
-  // @TODO: figure out why the backlink on operation is sometimes not present.
-  const otherBacklink = window.DOCUMENT.operations().find(
-    (op) =>
-      op.authorName === operation.authorName &&
-      op.seqNum === operation.seqNum - 1,
-  );
-
   const log = window.document.querySelector(
-    `nama-log-viz[author=${authorName}]`,
+    `nama-log-viz[author=${operation.authorName()}]`
   );
-  console.log(log);
-  log.addNode(hash, seqNum, otherBacklink);
+
+  log.addNode(operation.hash(), operation.seqNum(), operation.backlink());
+
+  for (const [publicKey, operations] of pruned) {
+    for (const hash of operations) {
+      log.prune(hash);
+    }
+  }
+
+  log.layout();
 };
 
 const init = async () => {
   window.DEPTH = 4;
   window.DOCUMENT = new wasm.Document();
-  window.GRAPH = initGraph('graph');
+  window.GRAPH = initGraph("graph");
   window.AUTHORS = {
     anna: {
-      name: 'anna',
+      name: "anna",
       online: true,
       latency: 0,
       interval: 800,
       document: new wasm.Document(),
+      seqNum: 0,
     },
     bobby: {
-      name: 'bobby',
+      name: "bobby",
       online: true,
       latency: 0,
       interval: 2000,
       document: new wasm.Document(),
+      seqNum: 0,
     },
     claire: {
-      name: 'claire',
+      name: "claire",
       online: true,
       latency: 0,
       interval: 10000,
       document: new wasm.Document(),
+      seqNum: 0,
     },
   };
 
   for (const name in window.AUTHORS) {
     const author = window.AUTHORS[name];
     const controls = document.querySelector(`#${name}`);
-    const latency = controls.querySelector('input[name=latency]');
+    const latency = controls.querySelector("input[name=latency]");
     latency.value = author.latency;
     latency.onchange = (e) => {
       author.latency = e.target.value;
     };
-    const interval = controls.querySelector('input[name=interval]');
+    const interval = controls.querySelector("input[name=interval]");
     interval.value = author.interval;
     interval.onchange = (e) => {
       author.interval = e.target.value;
       clearInterval(window[name]);
       window[name] = setInterval(publish, author.interval, author);
     };
-    const online = controls.querySelector('input[name=online]');
+    const online = controls.querySelector("input[name=online]");
     online.checked = author.online;
     online.onchange = (e) => {
       author.online = e.target.checked;
@@ -222,12 +229,12 @@ const init = async () => {
 };
 
 const run = () => {
-  const anna = window.AUTHORS['anna'];
-  window.ANNA = setInterval(publish, anna['interval'], anna);
-  const bobby = window.AUTHORS['bobby'];
-  window.BOBBY = setInterval(publish, bobby['interval'], bobby);
-  const claire = window.AUTHORS['claire'];
-  window.CLAIRE = setInterval(publish, claire['interval'], claire);
+  const anna = window.AUTHORS["anna"];
+  window.ANNA = setInterval(publish, anna["interval"], anna);
+  const bobby = window.AUTHORS["bobby"];
+  window.BOBBY = setInterval(publish, bobby["interval"], bobby);
+  const claire = window.AUTHORS["claire"];
+  window.CLAIRE = setInterval(publish, claire["interval"], claire);
 };
 
 const stop = () => {
@@ -236,17 +243,17 @@ const stop = () => {
   clearInterval(window.CLAIRE);
 };
 
-const stopButton = window.document.querySelector('#stop');
+const stopButton = window.document.querySelector("#stop");
 stopButton.onclick = (e) => {
   e.target.disabled = true;
-  window.document.querySelector('#go').disabled = false;
+  window.document.querySelector("#go").disabled = false;
   stop();
 };
 
-const goButton = window.document.querySelector('#go');
+const goButton = window.document.querySelector("#go");
 goButton.onclick = (e) => {
   e.target.disabled = true;
-  window.document.querySelector('#stop').disabled = false;
+  window.document.querySelector("#stop").disabled = false;
   run();
 };
 
