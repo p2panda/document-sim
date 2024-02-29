@@ -6,6 +6,11 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface NamaDocumentViz {
+        "addNode": (id: string, author: string, seqNum: number, previous?: Array<string>) => Promise<void>;
+        "layout": () => Promise<void>;
+        "prune": (id: string) => Promise<void>;
+    }
     interface NamaLogViz {
         "addNode": (id: string, seqNum: number, previous?: string) => Promise<void>;
         /**
@@ -17,6 +22,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLNamaDocumentVizElement extends Components.NamaDocumentViz, HTMLStencilElement {
+    }
+    var HTMLNamaDocumentVizElement: {
+        prototype: HTMLNamaDocumentVizElement;
+        new (): HTMLNamaDocumentVizElement;
+    };
     interface HTMLNamaLogVizElement extends Components.NamaLogViz, HTMLStencilElement {
     }
     var HTMLNamaLogVizElement: {
@@ -24,10 +35,13 @@ declare global {
         new (): HTMLNamaLogVizElement;
     };
     interface HTMLElementTagNameMap {
+        "nama-document-viz": HTMLNamaDocumentVizElement;
         "nama-log-viz": HTMLNamaLogVizElement;
     }
 }
 declare namespace LocalJSX {
+    interface NamaDocumentViz {
+    }
     interface NamaLogViz {
         /**
           * The log authors name
@@ -35,6 +49,7 @@ declare namespace LocalJSX {
         "author"?: string;
     }
     interface IntrinsicElements {
+        "nama-document-viz": NamaDocumentViz;
         "nama-log-viz": NamaLogViz;
     }
 }
@@ -42,6 +57,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "nama-document-viz": LocalJSX.NamaDocumentViz & JSXBase.HTMLAttributes<HTMLNamaDocumentVizElement>;
             "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;
         }
     }

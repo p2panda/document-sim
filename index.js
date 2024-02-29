@@ -1,51 +1,16 @@
 import * as wasm from "document-viz-wasm";
 import { Operation, Document } from "document-viz-wasm";
-import cytoscape from "cytoscape";
-import dagre from "cytoscape-dagre";
 import Gradient from "javascript-color-gradient";
-import styles from "./style.css";
 import { defineCustomElements } from "document-viz-components-loader";
 
-defineCustomElements();
-cytoscape.use(dagre);
+import styles from "./style.css";
 
-const gradientArray = new Gradient()
+defineCustomElements();
+
+export const gradientArray = new Gradient()
   .setColorGradient("#3F2CAF", "#e9446a", "#edc988", "#607D8B")
   .setMidpoint(20)
   .getColors();
-
-const initGraph = (el) => {
-  return cytoscape({
-    container: document.getElementById(el), // container to render in
-    elements: [],
-    style: [
-      // the stylesheet for the graph
-      {
-        selector: "node",
-        style: {
-          "text-background-padding": 30,
-          width: 40,
-          height: 40,
-          label: "data(label)",
-        },
-      },
-      {
-        selector: "edge",
-        style: {
-          width: 3,
-          "line-color": "#ccc",
-          "source-arrow-color": "#ccc",
-          "source-arrow-shape": "triangle",
-          "curve-style": "bezier",
-        },
-      },
-    ],
-
-    layout: {
-      name: "dagre",
-    },
-  });
-};
 
 const broadcast = (sender, receivers) => {
   for (const name in receivers) {
@@ -80,23 +45,10 @@ const publish = async (author) => {
   author.seqNum += 1;
   author.document.pruneBeforeDepthPerLog(window.DEPTH);
   broadcast(author, window.AUTHORS);
-  await updateVisualization(operation);
-};
 
-const updateVisualization = async (newOperation) => {
-  window.DOCUMENT.add(newOperation);
+  window.DOCUMENT.add(operation);
   const pruned = window.DOCUMENT.pruneBeforeDepthPerLog(window.DEPTH);
-
-  let previousOperations = [];
-  for (const previous of newOperation.previous()) {
-    const previousOperation = window.DOCUMENT.get(previous);
-    if (!previousOperation) {
-      continue;
-    }
-    previousOperations.push(previousOperation.hash());
-  }
-
-  await addNode(newOperation, previousOperations, pruned);
+  await addNode(operation, pruned);
 
   const sorted = document.querySelector("#sorted");
   sorted.innerHTML = "";
@@ -108,76 +60,37 @@ const updateVisualization = async (newOperation) => {
     div.innerText = `${operation.authorName()}_${operation.seqNum()}`;
     sorted.prepend(div);
   }
-
-  window.GRAPH.layout({
-    name: "dagre",
-    animate: true,
-    animateFilter: function (node, i) {
-      if (node.data().isNew) {
-        node.data("isNew", false);
-        return false;
-      }
-      return true;
-    },
-  }).run();
 };
 
-const addNode = async (operation, previousOperations, pruned) => {
-  const node = () => {
-    return {
-      group: "nodes",
-      grabbable: false,
-      data: {
-        label: `${operation.authorName()}_${operation.seqNum()}`,
-        id: operation.hash(),
-        isNew: true,
-      },
-      style: {
-        "background-color":
-          gradientArray[operation.seqNum() % gradientArray.length],
-      },
-    };
-  };
-
-  const graphNode = node();
-  window.GRAPH.add(graphNode);
-
-  for (const previous of previousOperations) {
-    window.GRAPH.add({
-      group: "edges",
-      data: {
-        source: previous,
-        target: operation.hash(),
-      },
-    });
-  }
-
-  for (const [publicKey, operations] of pruned) {
-    for (const hash of operations) {
-      const n = window.GRAPH.$(`#${hash}`);
-      window.GRAPH.remove(n);
-    }
-  }
-
+const addNode = async (operation, pruned) => {
+  const document = window.document.querySelector(`nama-document-viz`);
   const log = window.document.querySelector(
     `nama-log-viz[author=${operation.authorName()}]`
   );
 
+  document.addNode(
+    operation.hash(),
+    operation.authorName(),
+    operation.seqNum(),
+    operation.previous()
+  );
+
   log.addNode(operation.hash(), operation.seqNum(), operation.backlink());
 
-  for (const [publicKey, operations] of pruned) {
+  for (const [_, operations] of pruned) {
     for (const hash of operations) {
+      document.prune(hash);
       log.prune(hash);
     }
   }
 
+  document.layout();
   log.layout();
 };
 
 const init = async () => {
   window.DEPTH = 4;
   window.DOCUMENT = new wasm.Document();
-  window.GRAPH = initGraph("graph");
   window.AUTHORS = {
     anna: {
       name: "anna",

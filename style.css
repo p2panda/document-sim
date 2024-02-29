@@ -10,12 +10,6 @@ body {
   width: 100%;
 }
 
-#graph {
-  height: 100%;
-  min-height: 500px;
-  width: 500px;
-}
-
 #logs {
   display: flex;
   justify-content: space-between;
@@ -23,9 +17,15 @@ body {
   width: 500px;
 }
 
-.log {
+nama-log-viz {
   height: 500px;
   width: 120px;
+}
+
+nama-document-viz {
+  height: 100%;
+  min-height: 500px;
+  width: 500px;
 }
 
 #sorted {

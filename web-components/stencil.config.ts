@@ -1,4 +1,3 @@
-import { wasm } from '@rollup/plugin-wasm';
 import { Config } from '@stencil/core';
 
 export const config: Config = {
@@ -19,10 +18,4 @@ export const config: Config = {
       serviceWorker: null, // disable service workers
     },
   ],
-  rollupPlugins: {
-    before: [
-      // Plugins injected before rollupNodeResolve()
-      wasm(),
-    ],
-  },
 };
