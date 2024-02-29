@@ -17,12 +17,12 @@ body {
   width: 500px;
 }
 
-nama-log-viz {
+.log {
   height: 500px;
   width: 120px;
 }
 
-nama-document-viz {
+#document {
   height: 100%;
   min-height: 500px;
   width: 500px;

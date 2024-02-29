@@ -63,19 +63,14 @@ const publish = async (author) => {
 };
 
 const addNode = async (operation, pruned) => {
-  const document = window.document.querySelector(`nama-document-viz`);
-  const log = window.document.querySelector(
-    `nama-log-viz[author=${operation.authorName()}]`
-  );
+  const document = window.document.querySelector(`#document`);
+  const log = window.document.querySelector(`#${operation.authorName()}-log`);
 
-  document.addNode(
-    operation.hash(),
-    operation.authorName(),
-    operation.seqNum(),
-    operation.previous()
-  );
+  const label = `${operation.authorName()}_${operation.seqNum()}`;
+  const colour = gradientArray[seqNum % gradientArray.length];
 
-  log.addNode(operation.hash(), operation.seqNum(), operation.backlink());
+  document.addNode(operation.hash(), label, colour, operation.previous());
+  log.addNode(operation.hash(), label, colour, [operation.backlink()]);
 
   for (const [_, operations] of pruned) {
     for (const hash of operations) {

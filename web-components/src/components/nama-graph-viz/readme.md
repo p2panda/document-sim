@@ -1,4 +1,4 @@
-# nama-document-viz
+# nama-graph-viz
 
 
 
@@ -7,7 +7,7 @@
 
 ## Methods
 
-### `addNode(id: string, author: string, seqNum: number, previous?: Array<string>) => Promise<void>`
+### `addNode(id: string, label: string, colour: number, previous?: Array<string>) => Promise<void>`
 
 
 
@@ -16,8 +16,8 @@
 | Name       | Type       | Description |
 | ---------- | ---------- | ----------- |
 | `id`       | `string`   |             |
-| `author`   | `string`   |             |
-| `seqNum`   | `number`   |             |
+| `label`    | `string`   |             |
+| `colour`   | `number`   |             |
 | `previous` | `string[]` |             |
 
 #### Returns

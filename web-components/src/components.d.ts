@@ -6,59 +6,35 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface NamaDocumentViz {
-        "addNode": (id: string, author: string, seqNum: number, previous?: Array<string>) => Promise<void>;
-        "layout": () => Promise<void>;
-        "prune": (id: string) => Promise<void>;
-    }
-    interface NamaLogViz {
-        "addNode": (id: string, seqNum: number, previous?: string) => Promise<void>;
-        /**
-          * The log authors name
-         */
-        "author": string;
+    interface NamaGraphViz {
+        "addNode": (id: string, label: string, colour: number, previous?: Array<string>) => Promise<void>;
         "layout": () => Promise<void>;
         "prune": (id: string) => Promise<void>;
     }
 }
 declare global {
-    interface HTMLNamaDocumentVizElement extends Components.NamaDocumentViz, HTMLStencilElement {
+    interface HTMLNamaGraphVizElement extends Components.NamaGraphViz, HTMLStencilElement {
     }
-    var HTMLNamaDocumentVizElement: {
-        prototype: HTMLNamaDocumentVizElement;
-        new (): HTMLNamaDocumentVizElement;
-    };
-    interface HTMLNamaLogVizElement extends Components.NamaLogViz, HTMLStencilElement {
-    }
-    var HTMLNamaLogVizElement: {
-        prototype: HTMLNamaLogVizElement;
-        new (): HTMLNamaLogVizElement;
+    var HTMLNamaGraphVizElement: {
+        prototype: HTMLNamaGraphVizElement;
+        new (): HTMLNamaGraphVizElement;
     };
     interface HTMLElementTagNameMap {
-        "nama-document-viz": HTMLNamaDocumentVizElement;
-        "nama-log-viz": HTMLNamaLogVizElement;
+        "nama-graph-viz": HTMLNamaGraphVizElement;
     }
 }
 declare namespace LocalJSX {
-    interface NamaDocumentViz {
-    }
-    interface NamaLogViz {
-        /**
-          * The log authors name
-         */
-        "author"?: string;
+    interface NamaGraphViz {
     }
     interface IntrinsicElements {
-        "nama-document-viz": NamaDocumentViz;
-        "nama-log-viz": NamaLogViz;
+        "nama-graph-viz": NamaGraphViz;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "nama-document-viz": LocalJSX.NamaDocumentViz & JSXBase.HTMLAttributes<HTMLNamaDocumentVizElement>;
-            "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;
+            "nama-graph-viz": LocalJSX.NamaGraphViz & JSXBase.HTMLAttributes<HTMLNamaGraphVizElement>;
         }
     }
 }
