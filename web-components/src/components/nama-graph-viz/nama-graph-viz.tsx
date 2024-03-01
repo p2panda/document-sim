@@ -16,6 +16,10 @@ export class NamaDocumentViz {
 
   @Method()
   public async addNode(id: string, label: string, colour: number, previous?: Array<string>) {
+    if (this.graph.$(`#${id}`).length !== 0) {
+      return;
+    }
+
     this.graph.add({
       group: 'nodes',
       grabbable: false,
