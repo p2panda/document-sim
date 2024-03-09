@@ -5,12 +5,31 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Document, Operation } from "document-viz-wasm";
+export { Document, Operation } from "document-viz-wasm";
 export namespace Components {
     interface NamaGraphViz {
-        "addNode": (id: string, label: string, colour: number, previous?: Array<string>) => Promise<void>;
+        "add": (author: string, id: string, seqNum: number, previous: string[]) => Promise<void>;
         "layout": () => Promise<void>;
-        "prune": (id: string) => Promise<void>;
+        "peer"?: string;
+        "prune": (pruned: string[]) => Promise<void>;
     }
+    interface NamaLogViz {
+        "add": (author: string, id: string, seqNum: number, previousId: string) => Promise<void>;
+        "layout": () => Promise<void>;
+        "peer"?: string;
+        "prune": (pruned: string[]) => Promise<void>;
+    }
+    interface NamaPeer {
+        "author": string;
+        "interval": number;
+        "latency": number;
+        "namaDoc"?: Document;
+    }
+}
+export interface NamaPeerCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLNamaPeerElement;
 }
 declare global {
     interface HTMLNamaGraphVizElement extends Components.NamaGraphViz, HTMLStencilElement {
@@ -19,15 +38,55 @@ declare global {
         prototype: HTMLNamaGraphVizElement;
         new (): HTMLNamaGraphVizElement;
     };
+    interface HTMLNamaLogVizElement extends Components.NamaLogViz, HTMLStencilElement {
+    }
+    var HTMLNamaLogVizElement: {
+        prototype: HTMLNamaLogVizElement;
+        new (): HTMLNamaLogVizElement;
+    };
+    interface HTMLNamaPeerElementEventMap {
+        "namaSend": { latency: number; operation: Operation };
+        "namaPrune": { peer: string; pruned: string[] };
+    }
+    interface HTMLNamaPeerElement extends Components.NamaPeer, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLNamaPeerElementEventMap>(type: K, listener: (this: HTMLNamaPeerElement, ev: NamaPeerCustomEvent<HTMLNamaPeerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLNamaPeerElementEventMap>(type: K, listener: (this: HTMLNamaPeerElement, ev: NamaPeerCustomEvent<HTMLNamaPeerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLNamaPeerElement: {
+        prototype: HTMLNamaPeerElement;
+        new (): HTMLNamaPeerElement;
+    };
     interface HTMLElementTagNameMap {
         "nama-graph-viz": HTMLNamaGraphVizElement;
+        "nama-log-viz": HTMLNamaLogVizElement;
+        "nama-peer": HTMLNamaPeerElement;
     }
 }
 declare namespace LocalJSX {
     interface NamaGraphViz {
+        "peer"?: string;
+    }
+    interface NamaLogViz {
+        "peer"?: string;
+    }
+    interface NamaPeer {
+        "author"?: string;
+        "interval"?: number;
+        "latency"?: number;
+        "namaDoc"?: Document;
+        "onNamaPrune"?: (event: NamaPeerCustomEvent<{ peer: string; pruned: string[] }>) => void;
+        "onNamaSend"?: (event: NamaPeerCustomEvent<{ latency: number; operation: Operation }>) => void;
     }
     interface IntrinsicElements {
         "nama-graph-viz": NamaGraphViz;
+        "nama-log-viz": NamaLogViz;
+        "nama-peer": NamaPeer;
     }
 }
 export { LocalJSX as JSX };
@@ -35,6 +94,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "nama-graph-viz": LocalJSX.NamaGraphViz & JSXBase.HTMLAttributes<HTMLNamaGraphVizElement>;
+            "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;
+            "nama-peer": LocalJSX.NamaPeer & JSXBase.HTMLAttributes<HTMLNamaPeerElement>;
         }
     }
 }

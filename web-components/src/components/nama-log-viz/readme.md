@@ -1,4 +1,4 @@
-# nama-graph-viz
+# nama-log-viz
 
 
 
@@ -14,18 +14,18 @@
 
 ## Methods
 
-### `add(author: string, id: string, seqNum: number, previous: string[]) => Promise<void>`
+### `add(author: string, id: string, seqNum: number, previousId: string) => Promise<void>`
 
 
 
 #### Parameters
 
-| Name       | Type       | Description |
-| ---------- | ---------- | ----------- |
-| `author`   | `string`   |             |
-| `id`       | `string`   |             |
-| `seqNum`   | `number`   |             |
-| `previous` | `string[]` |             |
+| Name         | Type     | Description |
+| ------------ | -------- | ----------- |
+| `author`     | `string` |             |
+| `id`         | `string` |             |
+| `seqNum`     | `number` |             |
+| `previousId` | `string` |             |
 
 #### Returns
 
