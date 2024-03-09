@@ -7,44 +7,20 @@
 </head>
 
 <body>
+
+  <nama-peer author="anna" latency="200" interval="1000"></nama-peer>
+  <nama-peer author="billy" latency="500" interval="8000"></nama-peer>
+  <nama-peer author="claire" interval="10000"></nama-peer>
+
   <div id="container">
     <div id="logs">
-      <nama-graph-viz class="log" id="anna-log"></nama-graph-viz>
-      <nama-graph-viz class="log" id="bobby-log"></nama-graph-viz>
-      <nama-graph-viz class="log" id="claire-log"></nama-graph-viz>
+      <nama-log-viz peer="anna"></nama-log-viz>
+      <nama-log-viz peer="billy"></nama-log-viz>
+      <nama-log-viz peer="claire"></nama-log-viz>
     </div>
-    <nama-graph-viz id="document"></nama-graph-viz>
-    <div id="sorted"></div>
+    <nama-graph-viz peer="anna"></nama-graph-viz>
     <div id="controls">
-      <button disabled="true" id="stop">stop</button>
       <button id="go">go</button>
-      <div id="anna">
-        <h2>Anna</h2>
-        <label for="online">Online</label>
-        <input name="online" type="checkbox">
-        <label for="latency">Latency</label>
-        <input name="latency" type="number" min="0" max="5000">
-        <label for="interval">Interval</label>
-        <input name="interval" type="number" min="0" max="10000">
-      </div>
-      <div id="bobby">
-        <h2>Bobby</h2>
-        <label for="online">Online</label>
-        <input name="online" type="checkbox">
-        <label for="latency">Latency</label>
-        <input name="latency" type="number" min="0" max="5000">
-        <label for="interval">Interval</label>
-        <input name="interval" type="number" min="0" max="10000">
-      </div>
-      <div id="claire">
-        <h2>Claire</h2>
-        <label for="online">Latency</label>
-        <input name="online" type="checkbox">
-        <label for="latency">Latency</label>
-        <input name="latency" type="number" min="0" max="5000">
-        <label for="interval">Interval</label>
-        <input name="interval" type="number" min="0" max="10000">
-      </div>
     </div>
   </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
