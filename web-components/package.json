@@ -17,7 +17,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "build": "stencil build",
-    "start": "stencil build --dev --watch --serve",
+    "start": "stencil build --watch",
     "generate": "stencil generate"
   },
   "dependencies": {
