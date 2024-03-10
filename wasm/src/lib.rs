@@ -7,10 +7,7 @@ use namakemono::document::{Authored, Causal, CausalDocument, Hashable, Timestamp
 use namakemono::hash::Hash;
 use namakemono::identity::{PrivateKey, PublicKey};
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::convert::{IntoWasmAbi, RefFromWasmAbi};
 use wasm_bindgen::prelude::*;
-
-use crate::utils::jserr;
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug, PartialOrd, Ord, Hash)]
 #[wasm_bindgen]
@@ -34,8 +31,8 @@ impl Operation {
         self.hash.to_string()
     }
 
-    #[wasm_bindgen]
-    pub fn publicKey(&self) -> String {
+    #[wasm_bindgen(js_name = publicKey)]
+    pub fn public_key(&self) -> String {
         self.public_key.to_string()
     }
 
@@ -44,8 +41,8 @@ impl Operation {
         self.author_name.to_owned()
     }
 
-    #[wasm_bindgen]
-    pub fn seqNum(&self) -> i32 {
+    #[wasm_bindgen(js_name = seqNum)]
+    pub fn seq_num(&self) -> i32 {
         self.seq_num as i32
     }
 
@@ -134,7 +131,7 @@ impl Document {
             None
         } else {
             let log = self.document.logs().get(&author.public_key).unwrap();
-            log.iter().find(|(s, _, _)| *s == (seq_num  - 1) as u64)
+            log.iter().find(|(s, _, _)| *s == (seq_num - 1) as u64)
         };
 
         let hash: Hash = Hash::new(&format!("{}{}", author.public_key, seq_num));
@@ -163,6 +160,12 @@ impl Document {
     #[wasm_bindgen(js_name = pruneBeforeDepthPerLog)]
     pub fn prune_before_depth_per_log(&mut self, depth: u32) -> JsValue {
         let pruned = self.document.prune_before_depth_per_log(depth as usize);
+        serde_wasm_bindgen::to_value(&pruned).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = pruneBeforeDepth)]
+    pub fn prune_before_depth(&mut self, depth: u32) -> JsValue {
+        let pruned = self.document.prune_before_depth(depth as u64);
         serde_wasm_bindgen::to_value(&pruned).unwrap()
     }
 
