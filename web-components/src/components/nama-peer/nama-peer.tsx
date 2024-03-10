@@ -88,6 +88,7 @@ export class NamaPeer {
   render() {
     return (
       <Host>
+        <h2>{this.author} log</h2>
         <nama-peer-controls onOnlineChange={online => (this.online = online)}></nama-peer-controls>
         <slot />
       </Host>

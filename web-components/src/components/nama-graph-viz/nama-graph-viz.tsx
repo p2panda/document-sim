@@ -1,4 +1,4 @@
-import { Component, Element, h, Listen, Prop } from '@stencil/core';
+import { Component, Element, h, Host, Listen, Prop } from '@stencil/core';
 // import { Document, Operation } from 'document-viz-wasm';
 import { initGraph, gradientArray } from '../../utils/utils';
 import cytoscape from 'cytoscape';
@@ -111,6 +111,13 @@ export class NamaGraphViz {
   }
 
   render() {
-    return <div id="document"></div>;
+    return (
+      <Host>
+        <div>
+          <h2>{this.peer} document</h2>
+        </div>
+        <div id="document"></div>
+      </Host>
+    );
   }
 }
