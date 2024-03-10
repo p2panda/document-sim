@@ -7,18 +7,19 @@
 </head>
 
 <body>
-
-  <nama-peer author="anna" latency="200" interval="1000"></nama-peer>
-  <nama-peer author="billy" latency="500" interval="8000"></nama-peer>
-  <nama-peer author="claire" interval="10000"></nama-peer>
-
   <div id="container">
     <div id="logs">
-      <nama-log-viz peer="anna"></nama-log-viz>
-      <nama-log-viz peer="billy"></nama-log-viz>
-      <nama-log-viz peer="claire"></nama-log-viz>
+      <nama-peer author="anna" latency="500" interval="900">
+        <nama-log-viz peer="anna"></nama-log-viz>
+      </nama-peer>
+      <nama-peer author="billy" latency="200" interval="2000">
+        <nama-log-viz peer="billy"></nama-log-viz>
+      </nama-peer>
+      <nama-peer author="claire" interval="9500">
+        <nama-log-viz peer="claire"></nama-log-viz>
+      </nama-peer>
     </div>
-    <nama-graph-viz peer="anna"></nama-graph-viz>
+    <nama-graph-viz peer="claire"></nama-graph-viz>
     <div id="controls">
       <button id="go">go</button>
     </div>

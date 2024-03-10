@@ -17,11 +17,24 @@
 
 ## Events
 
-| Event       | Description | Type                                                      |
-| ----------- | ----------- | --------------------------------------------------------- |
-| `namaPrune` |             | `CustomEvent<{ peer: string; pruned: string[]; }>`        |
-| `namaSend`  |             | `CustomEvent<{ latency: number; operation: Operation; }>` |
+| Event        | Description | Type                                                                        |
+| ------------ | ----------- | --------------------------------------------------------------------------- |
+| `namaChange` |             | `CustomEvent<{ peer: string; operations: Operation[]; pruned: string[]; }>` |
+| `namaSend`   |             | `CustomEvent<{ peer: string; latency: number; operations: Operation[]; }>`  |
 
+
+## Dependencies
+
+### Depends on
+
+- [nama-peer-controls](../nama-peer-controls)
+
+### Graph
+```mermaid
+graph TD;
+  nama-peer --> nama-peer-controls
+  style nama-peer fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

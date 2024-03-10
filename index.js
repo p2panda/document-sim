@@ -12,4 +12,9 @@ goButton.onclick = (e) => {
   for (const peer of peers) {
     peer.namaDoc = new wasm.Document();
   }
+
+  const graphs = window.document.querySelectorAll("nama-graph-viz");
+  for (const graph of graphs) {
+    graph.namaDoc = new wasm.Document();
+  }
 };

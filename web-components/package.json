@@ -31,6 +31,7 @@
     "@types/cytoscape": "^3.19.16",
     "@types/cytoscape-dagre": "^2.3.3",
     "@types/node": "^16.18.11",
-    "@types/document-viz-wasm": "file:../wasm/pkg"
+    "@types/document-viz-wasm": "file:../wasm/pkg",
+    "document-viz-wasm": "file:../wasm/pkg"
   }
 }
