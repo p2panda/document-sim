@@ -98,6 +98,8 @@ pub struct Document {
 
 struct Author {
     public_key: PublicKey,
+    next_seq_num: u64,
+    backlink: Option<Hash>,
 }
 
 #[wasm_bindgen]
@@ -117,38 +119,31 @@ impl Document {
     }
 
     #[wasm_bindgen]
-    pub fn create(
-        &mut self,
-        author_name: String,
-        seq_num: u32,
-        timestamp: u32,
-    ) -> Result<Operation, JsValue> {
+    pub fn create(&mut self, author_name: String, timestamp: u32) -> Operation {
         let author = self.authors.entry(author_name.clone()).or_insert(Author {
             public_key: PrivateKey::new().public_key(),
+            next_seq_num: 0,
+            backlink: None,
         });
 
-        let backlink = if seq_num == 0 {
-            None
-        } else {
-            let log = self.document.logs().get(&author.public_key).unwrap();
-            log.iter().find(|(s, _, _)| *s == (seq_num - 1) as u64)
-        };
-
-        let hash: Hash = Hash::new(&format!("{}{}", author.public_key, seq_num));
+        let hash: Hash = Hash::new(&format!("{}{}", author.public_key, author.next_seq_num));
 
         let operation = Operation {
             author_name,
             public_key: author.public_key,
             hash,
-            seq_num: seq_num as u64,
+            seq_num: author.next_seq_num,
             timestamp,
-            backlink: backlink.map(|(_, _, hash)| *hash),
+            backlink: author.backlink,
             previous: self.document.tips().into_iter().cloned().collect(),
         };
 
         let _ignored = self.document.add(&[operation.clone()]);
 
-        Ok(operation)
+        author.next_seq_num += 1;
+        author.backlink = Some(hash);
+
+        operation
     }
 
     #[wasm_bindgen(js_name = pruneBeforeTimestamp)]
