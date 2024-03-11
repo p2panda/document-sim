@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+input[type='number'] {
+  width: 60px;
+}

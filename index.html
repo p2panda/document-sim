@@ -3,26 +3,26 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Hello wasm-pack!</title>
+  <title>Namakemono Document Viz</title>
 </head>
 
 <body>
   <div id="container">
     <div id="logs">
-      <nama-peer author="anna" latency=500 interval=900>
+      <nama-peer author="anna" latency=100 interval=2500>
         <nama-log-viz peer="anna"></nama-log-viz>
       </nama-peer>
-      <nama-peer author="billy" latency=200 interval=2000>
+      <nama-peer author="billy" latency=100 interval=3000>
         <nama-log-viz peer="billy"></nama-log-viz>
       </nama-peer>
-      <nama-peer author="claire" interval=9500>
+      <nama-peer author="claire" interval=8000>
         <nama-log-viz peer="claire"></nama-log-viz>
       </nama-peer>
     </div>
     <nama-graph-viz peer="claire"></nama-graph-viz>
-    <div id="controls">
+    <nama-document-controls depth=30 depth-per-log=4 ms=2000>
       <button id="go">go</button>
-    </div>
+    </nama-document-controls>
   </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>

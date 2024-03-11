@@ -8,6 +8,11 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Document, Operation } from "document-viz-wasm";
 export { Document, Operation } from "document-viz-wasm";
 export namespace Components {
+    interface NamaDocumentControls {
+        "depth"?: number;
+        "depthPerLog"?: 4;
+        "ms"?: number;
+    }
     interface NamaGraphViz {
         "peer"?: string;
     }
@@ -29,11 +34,32 @@ export namespace Components {
         "setOnline": CallableFunction;
     }
 }
+export interface NamaDocumentControlsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLNamaDocumentControlsElement;
+}
 export interface NamaPeerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLNamaPeerElement;
 }
 declare global {
+    interface HTMLNamaDocumentControlsElementEventMap {
+        "namaPruneConfig": { depth?: number; ms?: number; depthPerLog?: number };
+    }
+    interface HTMLNamaDocumentControlsElement extends Components.NamaDocumentControls, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLNamaDocumentControlsElementEventMap>(type: K, listener: (this: HTMLNamaDocumentControlsElement, ev: NamaDocumentControlsCustomEvent<HTMLNamaDocumentControlsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLNamaDocumentControlsElementEventMap>(type: K, listener: (this: HTMLNamaDocumentControlsElement, ev: NamaDocumentControlsCustomEvent<HTMLNamaDocumentControlsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLNamaDocumentControlsElement: {
+        prototype: HTMLNamaDocumentControlsElement;
+        new (): HTMLNamaDocumentControlsElement;
+    };
     interface HTMLNamaGraphVizElement extends Components.NamaGraphViz, HTMLStencilElement {
     }
     var HTMLNamaGraphVizElement: {
@@ -71,6 +97,7 @@ declare global {
         new (): HTMLNamaPeerControlsElement;
     };
     interface HTMLElementTagNameMap {
+        "nama-document-controls": HTMLNamaDocumentControlsElement;
         "nama-graph-viz": HTMLNamaGraphVizElement;
         "nama-log-viz": HTMLNamaLogVizElement;
         "nama-peer": HTMLNamaPeerElement;
@@ -78,6 +105,12 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface NamaDocumentControls {
+        "depth"?: number;
+        "depthPerLog"?: 4;
+        "ms"?: number;
+        "onNamaPruneConfig"?: (event: NamaDocumentControlsCustomEvent<{ depth?: number; ms?: number; depthPerLog?: number }>) => void;
+    }
     interface NamaGraphViz {
         "peer"?: string;
     }
@@ -101,6 +134,7 @@ declare namespace LocalJSX {
         "setOnline"?: CallableFunction;
     }
     interface IntrinsicElements {
+        "nama-document-controls": NamaDocumentControls;
         "nama-graph-viz": NamaGraphViz;
         "nama-log-viz": NamaLogViz;
         "nama-peer": NamaPeer;
@@ -111,6 +145,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "nama-document-controls": LocalJSX.NamaDocumentControls & JSXBase.HTMLAttributes<HTMLNamaDocumentControlsElement>;
             "nama-graph-viz": LocalJSX.NamaGraphViz & JSXBase.HTMLAttributes<HTMLNamaGraphVizElement>;
             "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;
             "nama-peer": LocalJSX.NamaPeer & JSXBase.HTMLAttributes<HTMLNamaPeerElement>;
