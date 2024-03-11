@@ -11,8 +11,6 @@ export class NamaPeer {
 
   intervalID?: NodeJS.Timer;
 
-  seqNum: number = 0;
-
   @Prop() author: string = 'noname';
 
   @Prop() latency: number = 0;
@@ -20,6 +18,16 @@ export class NamaPeer {
   @Prop() interval: number = 1000;
 
   @State() online: boolean = true;
+
+  pruneDepth?: number;
+
+  pruneDepthPerLog?: number;
+
+  pruneBefore?: number;
+
+  nextPublishAt: number;
+
+  queue: Operation[] = new Array();
 
   @Element() el;
 
@@ -30,7 +38,6 @@ export class NamaPeer {
   @Listen('namaSend', { target: 'window' })
   handleOnSend(e: CustomEvent<{ peer: string; latency: number; operations: Operation[] }>) {
     const { peer, latency, operations } = e.detail;
-
     if (this.author === peer) {
       return;
     }
@@ -41,39 +48,84 @@ export class NamaPeer {
 
     setTimeout(() => {
       for (const operation of operations) {
-        this.namaDoc.add(operation);
+        if (!this.queue.includes(operation)) {
+          this.queue.push(operation);
+        }
       }
-
-      let pruned = [];
-      this.namaDoc.pruneBeforeDepth(12).forEach(hashes => {
-        pruned = pruned.concat(hashes);
-      });
-
-      this.namaChange.emit({ peer: this.author, operations: this.namaDoc.operations(), pruned });
     }, this.latency + latency);
   }
 
-  publish() {
+  @Listen('namaPruneConfig', { target: 'window' })
+  handlePruneConfig(e: CustomEvent<{ depth?: number; ms?: number; depthPerLog?: number }>) {
+    const { depth, ms, depthPerLog } = e.detail;
+
+    this.pruneDepth = depth;
+    this.pruneDepthPerLog = depthPerLog;
+    this.pruneBefore = ms;
+  }
+
+  prune(): string[] {
+    let pruned = [];
+
+    if (this.pruneDepth) {
+      this.namaDoc.pruneBeforeDepth(this.pruneDepth).forEach(hashes => {
+        pruned = pruned.concat(hashes);
+      });
+    }
+
+    if (this.pruneDepthPerLog) {
+      this.namaDoc.pruneBeforeDepthPerLog(this.pruneDepthPerLog).forEach(hashes => {
+        pruned = pruned.concat(hashes);
+      });
+    }
+
+    if (this.pruneBefore) {
+      this.namaDoc.pruneBeforeTimestamp(new Date().getTime() - this.pruneBefore).forEach(hashes => {
+        pruned = pruned.concat(hashes);
+      });
+    }
+
+    return pruned;
+  }
+
+  run() {
     if (!this.namaDoc) {
       return;
     }
 
-    // Create a new operation for this author.
-    const timestamp = new Date().getMilliseconds();
-    this.namaDoc.create(this.author, this.seqNum, timestamp);
-    this.seqNum += 1;
-
-    let pruned = [];
-    this.namaDoc.pruneBeforeDepth(12).forEach(hashes => {
-      pruned = pruned.concat(hashes);
-    });
-
-    const operations = this.namaDoc.operations();
-
-    if (this.online) {
-      this.namaSend.emit({ peer: this.author, latency: this.latency, operations });
+    let changed = false;
+    const now = new Date().getTime();
+    if (now >= this.nextPublishAt) {
+      // Create a new operation for this author.
+      const timestamp = new Date().getTime();
+      const operation = this.namaDoc.create(this.author, timestamp);
+      console.log(operation);
+      if (this.online) {
+        const operations = this.namaDoc.operations();
+        this.namaSend.emit({ peer: this.author, latency: this.latency, operations });
+      }
+      changed = true;
+      this.nextPublishAt = now + this.interval;
     }
-    this.namaChange.emit({ peer: this.author, operations, pruned });
+
+    for (const operation of this.queue) {
+      const ignored = this.namaDoc.add(operation);
+      if (ignored.length == 0) {
+        changed = true;
+      }
+    }
+
+    this.queue = [];
+
+    if (changed) {
+      const operations = this.namaDoc.operations();
+      const pruned = this.prune();
+      this.namaChange.emit({ peer: this.author, operations, pruned });
+    }
+  }
+
+  componentWillRender() {
+    this.nextPublishAt = new Date().getTime() + this.interval;
   }
 
   componentWillUpdate() {
@@ -82,7 +134,7 @@ export class NamaPeer {
   }
 
   componentDidUpdate() {
-    this.intervalID = setInterval(this.publish.bind(this), this.interval);
+    this.intervalID = setInterval(this.run.bind(this), 100);
   }
 
   render() {
