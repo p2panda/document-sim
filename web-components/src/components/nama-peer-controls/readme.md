@@ -7,9 +7,14 @@
 
 ## Properties
 
-| Property         | Attribute | Description | Type               | Default     |
-| ---------------- | --------- | ----------- | ------------------ | ----------- |
-| `onOnlineChange` | --        |             | `CallableFunction` | `undefined` |
+| Property       | Attribute   | Description | Type               | Default     |
+| -------------- | ----------- | ----------- | ------------------ | ----------- |
+| `frequency`    | `frequency` |             | `number`           | `undefined` |
+| `latency`      | `latency`   |             | `number`           | `undefined` |
+| `online`       | `online`    |             | `boolean`          | `undefined` |
+| `setFrequency` | --          |             | `CallableFunction` | `undefined` |
+| `setLatency`   | --          |             | `CallableFunction` | `undefined` |
+| `setOnline`    | --          |             | `CallableFunction` | `undefined` |
 
 
 ## Dependencies

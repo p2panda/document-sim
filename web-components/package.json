@@ -30,8 +30,8 @@
     "@rollup/plugin-wasm": "^6.2.2",
     "@types/cytoscape": "^3.19.16",
     "@types/cytoscape-dagre": "^2.3.3",
-    "@types/node": "^16.18.11",
     "@types/document-viz-wasm": "file:../wasm/pkg",
+    "@types/node": "^16.18.11",
     "document-viz-wasm": "file:../wasm/pkg"
   }
 }

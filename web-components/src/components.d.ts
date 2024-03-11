@@ -21,7 +21,12 @@ export namespace Components {
         "namaDoc"?: Document;
     }
     interface NamaPeerControls {
-        "onOnlineChange": CallableFunction;
+        "frequency": number;
+        "latency": number;
+        "online": boolean;
+        "setFrequency": CallableFunction;
+        "setLatency": CallableFunction;
+        "setOnline": CallableFunction;
     }
 }
 export interface NamaPeerCustomEvent<T> extends CustomEvent<T> {
@@ -88,7 +93,12 @@ declare namespace LocalJSX {
         "onNamaSend"?: (event: NamaPeerCustomEvent<{ peer: string; latency: number; operations: Operation[] }>) => void;
     }
     interface NamaPeerControls {
-        "onOnlineChange"?: CallableFunction;
+        "frequency"?: number;
+        "latency"?: number;
+        "online"?: boolean;
+        "setFrequency"?: CallableFunction;
+        "setLatency"?: CallableFunction;
+        "setOnline"?: CallableFunction;
     }
     interface IntrinsicElements {
         "nama-graph-viz": NamaGraphViz;

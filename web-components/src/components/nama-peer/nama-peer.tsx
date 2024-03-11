@@ -88,8 +88,15 @@ export class NamaPeer {
   render() {
     return (
       <Host>
-        <h2>{this.author} log</h2>
-        <nama-peer-controls onOnlineChange={online => (this.online = online)}></nama-peer-controls>
+        <h2>{this.author}</h2>
+        <nama-peer-controls
+          online={this.online}
+          latency={this.latency}
+          frequency={this.interval}
+          setOnline={value => (this.online = value)}
+          setLatency={value => (this.latency = value)}
+          setFrequency={value => (this.interval = value)}
+        ></nama-peer-controls>
         <slot />
       </Host>
     );

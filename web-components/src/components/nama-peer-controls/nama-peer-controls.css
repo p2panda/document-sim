@@ -1,3 +1,10 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
