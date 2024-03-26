@@ -13,12 +13,14 @@
 | `interval` | `interval` |             | `number`   | `1000`     |
 | `latency`  | `latency`  |             | `number`   | `0`        |
 | `namaDoc`  | --         |             | `Document` | `null`     |
+| `owner`    | `owner`    |             | `boolean`  | `false`    |
 
 
 ## Events
 
 | Event        | Description | Type                                                                        |
 | ------------ | ----------- | --------------------------------------------------------------------------- |
+| `namaCaps`   |             | `CustomEvent<{ author: string; from?: number; to?: number; }>`              |
 | `namaChange` |             | `CustomEvent<{ peer: string; operations: Operation[]; pruned: string[]; }>` |
 | `namaSend`   |             | `CustomEvent<{ peer: string; latency: number; operations: Operation[]; }>`  |
 

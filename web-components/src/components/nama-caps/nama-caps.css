@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+#wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+}
+
+.row > div {
+  padding: 3px;
+}
+
+.row > div:nth-child(1n + 2) {
+  flex: initial;
+  width: 100px;
+}
+
+.row > div:nth-child(1) {
+  width: 160px;
+  flex: initial;
+}
+
+input {
+  width: 100%;
+  padding: 0px;
+}
+
+.valid {
+  background-color: green;
+}
+
+.expired {
+  background-color: red;
+}

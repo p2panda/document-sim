@@ -3,11 +3,11 @@ import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/c
 @Component({
   tag: 'nama-document-controls',
   styleUrl: 'nama-document-controls.css',
-  shadow: false,
+  shadow: true,
 })
 export class NamaPeerControls {
   @Prop() depth?: number = 20;
-  @Prop() ms?: number = 1000;
+  @Prop() secs?: number = 10;
   @Prop() depthPerLog?: 4;
 
   @State() pruneByTimestamp: boolean = false;
@@ -25,7 +25,7 @@ export class NamaPeerControls {
         this.depthPerLog = e.target.value;
         break;
       case 'ms':
-        this.ms = e.target.value;
+        this.secs = e.target.value;
         break;
       case 'prune-by-depth':
         this.pruneByDepth = e.target.checked;
@@ -41,7 +41,7 @@ export class NamaPeerControls {
     this.namaPruneConfig.emit({
       depth: this.pruneByDepth ? this.depth : null,
       depthPerLog: this.pruneByDepthPerLog ? this.depthPerLog : null,
-      ms: this.pruneByTimestamp ? this.ms : null,
+      ms: this.pruneByTimestamp ? this.secs * 1000 : null,
     });
   };
 
@@ -64,10 +64,10 @@ export class NamaPeerControls {
           </div>
         </div>
         <div class="input-field">
-          <label htmlFor="prune-by-timestamp">prune after (ms)</label>
+          <label htmlFor="prune-by-timestamp">prune after (s)</label>
           <div>
             <input name="prune-by-timestamp" checked={this.pruneByTimestamp} type="checkbox" onChange={this.onChange} />
-            <input name="ms" type="number" min={1000} max={10000} value={this.ms} onChange={this.onChange} />
+            <input name="secs" type="number" min={1} max={60} value={this.secs} onChange={this.onChange} />
           </div>
         </div>
       </Host>

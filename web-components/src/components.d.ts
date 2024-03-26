@@ -8,10 +8,12 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Document, Operation } from "document-viz-wasm";
 export { Document, Operation } from "document-viz-wasm";
 export namespace Components {
+    interface NamaCaps {
+    }
     interface NamaDocumentControls {
         "depth"?: number;
         "depthPerLog"?: 4;
-        "ms"?: number;
+        "secs"?: number;
     }
     interface NamaGraphViz {
         "peer"?: string;
@@ -24,6 +26,7 @@ export namespace Components {
         "interval": number;
         "latency": number;
         "namaDoc"?: Document;
+        "owner": boolean;
     }
     interface NamaPeerControls {
         "frequency": number;
@@ -34,6 +37,10 @@ export namespace Components {
         "setOnline": CallableFunction;
     }
 }
+export interface NamaCapsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLNamaCapsElement;
+}
 export interface NamaDocumentControlsCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLNamaDocumentControlsElement;
@@ -43,6 +50,23 @@ export interface NamaPeerCustomEvent<T> extends CustomEvent<T> {
     target: HTMLNamaPeerElement;
 }
 declare global {
+    interface HTMLNamaCapsElementEventMap {
+        "namaCaps": { author: string; from?: number; to?: number };
+    }
+    interface HTMLNamaCapsElement extends Components.NamaCaps, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLNamaCapsElementEventMap>(type: K, listener: (this: HTMLNamaCapsElement, ev: NamaCapsCustomEvent<HTMLNamaCapsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLNamaCapsElementEventMap>(type: K, listener: (this: HTMLNamaCapsElement, ev: NamaCapsCustomEvent<HTMLNamaCapsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLNamaCapsElement: {
+        prototype: HTMLNamaCapsElement;
+        new (): HTMLNamaCapsElement;
+    };
     interface HTMLNamaDocumentControlsElementEventMap {
         "namaPruneConfig": { depth?: number; ms?: number; depthPerLog?: number };
     }
@@ -75,6 +99,7 @@ declare global {
     interface HTMLNamaPeerElementEventMap {
         "namaSend": { peer: string; latency: number; operations: Operation[] };
         "namaChange": { peer: string; operations: Operation[]; pruned: string[] };
+        "namaCaps": { author: string; from?: number; to?: number };
     }
     interface HTMLNamaPeerElement extends Components.NamaPeer, HTMLStencilElement {
         addEventListener<K extends keyof HTMLNamaPeerElementEventMap>(type: K, listener: (this: HTMLNamaPeerElement, ev: NamaPeerCustomEvent<HTMLNamaPeerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -97,6 +122,7 @@ declare global {
         new (): HTMLNamaPeerControlsElement;
     };
     interface HTMLElementTagNameMap {
+        "nama-caps": HTMLNamaCapsElement;
         "nama-document-controls": HTMLNamaDocumentControlsElement;
         "nama-graph-viz": HTMLNamaGraphVizElement;
         "nama-log-viz": HTMLNamaLogVizElement;
@@ -105,11 +131,14 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface NamaCaps {
+        "onNamaCaps"?: (event: NamaCapsCustomEvent<{ author: string; from?: number; to?: number }>) => void;
+    }
     interface NamaDocumentControls {
         "depth"?: number;
         "depthPerLog"?: 4;
-        "ms"?: number;
         "onNamaPruneConfig"?: (event: NamaDocumentControlsCustomEvent<{ depth?: number; ms?: number; depthPerLog?: number }>) => void;
+        "secs"?: number;
     }
     interface NamaGraphViz {
         "peer"?: string;
@@ -122,8 +151,10 @@ declare namespace LocalJSX {
         "interval"?: number;
         "latency"?: number;
         "namaDoc"?: Document;
+        "onNamaCaps"?: (event: NamaPeerCustomEvent<{ author: string; from?: number; to?: number }>) => void;
         "onNamaChange"?: (event: NamaPeerCustomEvent<{ peer: string; operations: Operation[]; pruned: string[] }>) => void;
         "onNamaSend"?: (event: NamaPeerCustomEvent<{ peer: string; latency: number; operations: Operation[] }>) => void;
+        "owner"?: boolean;
     }
     interface NamaPeerControls {
         "frequency"?: number;
@@ -134,6 +165,7 @@ declare namespace LocalJSX {
         "setOnline"?: CallableFunction;
     }
     interface IntrinsicElements {
+        "nama-caps": NamaCaps;
         "nama-document-controls": NamaDocumentControls;
         "nama-graph-viz": NamaGraphViz;
         "nama-log-viz": NamaLogViz;
@@ -145,6 +177,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "nama-caps": LocalJSX.NamaCaps & JSXBase.HTMLAttributes<HTMLNamaCapsElement>;
             "nama-document-controls": LocalJSX.NamaDocumentControls & JSXBase.HTMLAttributes<HTMLNamaDocumentControlsElement>;
             "nama-graph-viz": LocalJSX.NamaGraphViz & JSXBase.HTMLAttributes<HTMLNamaGraphVizElement>;
             "nama-log-viz": LocalJSX.NamaLogViz & JSXBase.HTMLAttributes<HTMLNamaLogVizElement>;

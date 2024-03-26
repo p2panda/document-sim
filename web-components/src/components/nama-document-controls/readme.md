@@ -11,7 +11,7 @@
 | ------------- | --------------- | ----------- | -------- | ----------- |
 | `depth`       | `depth`         |             | `number` | `20`        |
 | `depthPerLog` | `depth-per-log` |             | `4`      | `undefined` |
-| `ms`          | `ms`            |             | `number` | `1000`      |
+| `secs`        | `secs`          |             | `number` | `10`        |
 
 
 ## Events

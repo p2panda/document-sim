@@ -17,6 +17,8 @@ export class NamaPeer {
 
   @Prop() interval: number = 1000;
 
+  @Prop() owner: boolean = false;
+
   @State() online: boolean = true;
 
   pruneDepth?: number;
@@ -27,6 +29,10 @@ export class NamaPeer {
 
   nextPublishAt: number;
 
+  from: number = 0;
+
+  to: number = 0;
+
   queue: Operation[] = new Array();
 
   intervalID?: NodeJS.Timer;
@@ -34,6 +40,8 @@ export class NamaPeer {
   @Event() namaSend: EventEmitter<{ peer: string; latency: number; operations: Operation[] }>;
 
   @Event() namaChange: EventEmitter<{ peer: string; operations: Operation[]; pruned: string[] }>;
+
+  @Event() namaCaps: EventEmitter<{ author: string; from?: number; to?: number }>;
 
   @Listen('namaSend', { target: 'window' })
   handleOnSend(e: CustomEvent<{ peer: string; latency: number; operations: Operation[] }>) {
@@ -62,6 +70,16 @@ export class NamaPeer {
     this.pruneDepth = depth;
     this.pruneDepthPerLog = depthPerLog;
     this.pruneBefore = ms;
+  }
+
+  @Listen('namaCaps', { target: 'window' })
+  handleCaps(e: CustomEvent<{ author: string; from?: number; to?: number }>) {
+    const { author, from, to } = e.detail;
+
+    if (author === this.author) {
+      this.from = from;
+      this.to = to;
+    }
   }
 
   prune(): string[] {
@@ -96,16 +114,18 @@ export class NamaPeer {
     let changed = false;
     const now = new Date().getTime();
     if (now >= this.nextPublishAt) {
-      // Create a new operation for this author.
       const timestamp = new Date().getTime();
-      const operation = this.namaDoc.create(this.author, timestamp);
-      console.log(operation);
-      if (this.online) {
-        const operations = this.namaDoc.operations();
-        this.namaSend.emit({ peer: this.author, latency: this.latency, operations });
+
+      if ((this.from <= timestamp && this.to >= timestamp) || this.owner) {
+        this.namaDoc.create(this.author, timestamp);
+
+        if (this.online) {
+          const operations = this.namaDoc.operations();
+          this.namaSend.emit({ peer: this.author, latency: this.latency, operations });
+        }
+        changed = true;
+        this.nextPublishAt = now + this.interval;
       }
-      changed = true;
-      this.nextPublishAt = now + this.interval;
     }
 
     for (const operation of this.queue) {
@@ -140,7 +160,7 @@ export class NamaPeer {
   render() {
     return (
       <Host>
-        <h2>{this.author}</h2>
+        <h2 class={this.owner ? 'owner' : ''}>{this.author}</h2>
         <nama-peer-controls
           online={this.online}
           latency={this.latency}

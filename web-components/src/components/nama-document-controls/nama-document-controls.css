@@ -5,10 +5,15 @@
 
 .input-field {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
 }
 
 input[type='number'] {
   width: 60px;
+}
+
+.input-field > div {
+  flex: 0 0 150px;
 }

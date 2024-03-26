@@ -17,6 +17,10 @@ body {
   width: 500px;
 }
 
+#go {
+  font-size: x-large;
+}
+
 nama-log-viz {
   height: 500px;
   width: 120px;
@@ -28,10 +32,20 @@ nama-graph-viz {
   width: 800px;
 }
 
-nama-document-controls {
+#controls {
+  display: flex;
+  flex-direction: column;
   position: fixed;
   right: 0px;
   top: 0px;
   padding: 20px;
-  width: 300px;
+  width: 500px;
+}
+
+nama-document-controls {
+  width: 500px;
+}
+
+nama-caps {
+  width: 500px;
 }
