@@ -7,9 +7,9 @@ import { Document, Operation } from 'document-viz-wasm';
   shadow: true,
 })
 export class NamaPeer {
-  @Prop() namaDoc?: Document = null;
+  @Element() el;
 
-  intervalID?: NodeJS.Timer;
+  @Prop() namaDoc?: Document = null;
 
   @Prop() author: string = 'noname';
 
@@ -29,7 +29,7 @@ export class NamaPeer {
 
   queue: Operation[] = new Array();
 
-  @Element() el;
+  intervalID?: NodeJS.Timer;
 
   @Event() namaSend: EventEmitter<{ peer: string; latency: number; operations: Operation[] }>;
 

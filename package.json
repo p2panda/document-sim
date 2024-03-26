@@ -6,7 +6,8 @@
   "scripts": {
     "build-wasm": "wasm-pack build ./wasm",
     "build-components": "cd web-components && npm run build",
-    "build": "npm run build-wasm && npm run build-components && webpack --config webpack.config.js",
+    "build-components-prod": "cd web-components && npm run build --mode=production",
+    "build": "npm run build-wasm && npm run build-components-prod && webpack --config webpack.config.js --mode=production",
     "start": "webpack-dev-server"
   },
   "keywords": [
