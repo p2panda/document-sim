@@ -1,5 +1,6 @@
 import * as wasm from "nama-document-viz-wasm";
 import { defineCustomElements } from "document-viz-components-loader";
+import styles from "./style.css";
 
 defineCustomElements();
 
