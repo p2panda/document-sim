@@ -3,13 +3,77 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Hello wasm-pack!</title>
+  <title>Namakemono Document Simulator</title>
 </head>
 
 <body>
   <div id="container">
-    <div id="graph"></div>
-    <div id="sorted"></div>
+    <div id="authors">
+      <div id="authors-header">
+        <h2>Author logs</h2>
+        <p>
+          Authors create and update documents by publishing operations. Each author has
+          their own operation log associated with a document. Depending on the pruning logic for the
+          document, an authors log will be trimmed or even completely removed.
+        </p>
+
+        <p>
+          The authors in this document are "anna" (owner), "billy" and "claire". They are peers on
+          the network and send messages to each other containing any changes they make. They do
+          this at different <i>frequencies</i> and the messages are delayed by network
+          <i>latency</i>. High latency and frequent changes will result in concurrent changes
+          occurring more often. Sometimes peers may go offline entirely, but keep editing their
+          document locally.
+        </p>
+      </div>
+      <div id="logs">
+        <div class="log">
+          <nama-peer author="anna" interval=2500 owner="true"></nama-peer>
+          <nama-log-viz peer="anna"></nama-log-viz>
+        </div>
+        <div class="log">
+          <nama-peer author="billy" latency=100 interval=2000></nama-peer>
+          <nama-log-viz peer="billy"></nama-log-viz>
+        </div>
+        <div class="log">
+          <nama-peer author="claire" latency=300 interval=3000></nama-peer>
+          <nama-log-viz peer="claire"></nama-log-viz>
+        </div>
+      </div>
+    </div>
+    <div id="document">
+      <h2>Document Graph</h2>
+      <div id="document-graph">
+        <nama-graph-viz peer="anna"></nama-graph-viz>
+      </div>
+    </div>
+    <div id="controls">
+      <button id="go">START!</button>
+      <h2>Document</h2>
+
+      <p>
+        A document "window" bounds the set of operations which make up it's current history. It's
+        possible to keep a documents entire history of changes, or only the most recent. The size of
+        the window is determined by the documents' pruning strategy. Below are three basic
+        parameters for configuring when operations should be pruned, by depth (distance from tip) or
+        by timestamp. There is the possibility to introduce custom pruning algorithms which could have
+        application specific logic.
+      </p>
+
+      <nama-document-controls depth=30 depth-per-log=4 ms=2000></nama-document-controls>
+      <h2>Capabilities</h2>
+
+      <p>
+        Initially only a documents owner (creator) is authorized to perform any actions (read, write,
+        delete) on it. When collaboration is desired, the owner can issue tokens (aka
+        capabilities) which state <i>who</i> can perform <i>what</i> actions <i>when</i>. The
+        current document is owned by <b>anna</b>, we can simulate issuing capabilities over time
+        ranges here. Type the name ("billy" or "claire") of the author you want to issue the
+        capability to, and state how long it should be valid.
+      </p>
+
+      <nama-caps></nama-caps>
+    </div>
   </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>
