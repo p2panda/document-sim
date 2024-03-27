@@ -5,7 +5,7 @@
 ## dev
 
 ```bash
-# Compile wasm package and bundle with all other web assets
+# Compile and bundle all web assets
 npm run build
 
 # Run dev server
