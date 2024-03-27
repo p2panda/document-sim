@@ -32,8 +32,8 @@
   "dependencies": {
     "cytoscape": "^3.28.1",
     "cytoscape-dagre": "^2.5.0",
-    "document-viz-components-loader": "file:web-components/loader",
+    "document-viz-components-loader": "file:./web-components/loader",
     "javascript-color-gradient": "^2.4.4",
-    "nama-document-viz-wasm": "file:wasm-pkg"
+    "nama-document-viz-wasm": "file:./wasm-pkg"
   }
 }
