@@ -8,18 +8,45 @@
 
 <body>
   <div id="container">
-    <div id="logs">
-      <nama-peer author="anna" interval=2500 owner="true">
-        <nama-log-viz peer="anna"></nama-log-viz>
-      </nama-peer>
-      <nama-peer author="billy" latency=100 interval=2000>
-        <nama-log-viz peer="billy"></nama-log-viz>
-      </nama-peer>
-      <nama-peer author="claire" latency=300 interval=3000>
-        <nama-log-viz peer="claire"></nama-log-viz>
-      </nama-peer>
+    <div id="authors">
+      <div id="authors-header">
+        <h2>Author logs</h2>
+        <p>
+          Authors publish create and update documents by publishing operations. Each author has
+          their own operation log associated with a document. Depending on the pruning logic for the
+          document, an authors log will be trimmed or even completely removed.
+        </p>
+
+        <p>
+          The authors in this document are "anna" (owner), "billy" and "claire". They are peers on
+          the network and send messages to each other containing any changes they make. They do
+          this at different <i>frequencies</i> and the messages are delayed by network
+          <i>latency</i>. High latency and frequent changes will result in concurrent changes
+          occurring more often. Sometimes peers may go offline entirely, but keep editing their
+          document locally.
+        </p>
+      </div>
+      <div id="logs">
+        <div class="log">
+          <nama-peer author="anna" interval=2500 owner="true"></nama-peer>
+          <nama-log-viz peer="anna"></nama-log-viz>
+        </div>
+        <div class="log">
+          <nama-peer author="billy" latency=100 interval=2000></nama-peer>
+          <nama-log-viz peer="billy"></nama-log-viz>
+        </div>
+        <div class="log">
+          <nama-peer author="claire" latency=300 interval=3000></nama-peer>
+          <nama-log-viz peer="claire"></nama-log-viz>
+        </div>
+      </div>
     </div>
-    <nama-graph-viz peer="anna"></nama-graph-viz>
+    <div id="document">
+      <h2>Document Graph</h2>
+      <div id="document-graph">
+        <nama-graph-viz peer="anna"></nama-graph-viz>
+      </div>
+    </div>
     <div id="controls">
       <button id="go">START!</button>
       <h2>Document</h2>

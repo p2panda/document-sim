@@ -160,6 +160,7 @@ export class NamaPeer {
   render() {
     return (
       <Host>
+        <div id="wrapper">
         <h2 class={this.owner ? 'owner' : ''}>{this.author}</h2>
         <nama-peer-controls
           online={this.online}
@@ -169,7 +170,7 @@ export class NamaPeer {
           setLatency={value => (this.latency = value)}
           setFrequency={value => (this.interval = value)}
         ></nama-peer-controls>
-        <slot />
+        </div>
       </Host>
     );
   }

@@ -113,9 +113,6 @@ export class NamaGraphViz {
   render() {
     return (
       <Host>
-        <div>
-          <h2>{this.peer} document</h2>
-        </div>
         <div id="document"></div>
       </Host>
     );

@@ -1,8 +1,6 @@
 import * as wasm from "document-viz-wasm";
 import { defineCustomElements } from "document-viz-components-loader";
 
-import styles from "./style.css";
-
 defineCustomElements();
 
 const goButton = window.document.querySelector("#go");
