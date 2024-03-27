@@ -1,0 +1,19 @@
+{
+  "name": "nama-document-viz-wasm",
+  "collaborators": [
+    "Sam Andreae <contact@samandreae.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "nama_document_viz_wasm_bg.wasm",
+    "nama_document_viz_wasm.js",
+    "nama_document_viz_wasm_bg.js",
+    "nama_document_viz_wasm.d.ts"
+  ],
+  "module": "nama_document_viz_wasm.js",
+  "types": "nama_document_viz_wasm.d.ts",
+  "sideEffects": [
+    "./nama_document_viz_wasm.js",
+    "./snippets/*"
+  ]
+}
