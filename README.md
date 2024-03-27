@@ -1,4 +1,4 @@
-# `namakemono` document visualizations
+# `namakemono` document simulations
 
 ![screenshot of document graph simulation](/screenshot.png)
 
