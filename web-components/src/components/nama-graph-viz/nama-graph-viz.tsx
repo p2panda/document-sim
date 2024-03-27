@@ -3,7 +3,7 @@ import { Component, Element, h, Host, Listen, Prop } from '@stencil/core';
 import { initGraph, gradientArray } from '../../utils/utils';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
-import { Operation } from 'document-viz-wasm';
+import { Operation } from 'nama-document-viz-wasm';
 
 @Component({
   tag: 'nama-graph-viz',

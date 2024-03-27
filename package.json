@@ -7,7 +7,7 @@
     "build-wasm": "wasm-pack build ./wasm",
     "build-components": "cd web-components && npm run build",
     "build-components-prod": "cd web-components && npm run build --mode=production",
-    "build": "npm run build-wasm && npm run build-components-prod && webpack --config webpack.config.js --mode=production",
+    "build": "npm run build-components-prod && webpack --config webpack.config.js --mode=production",
     "start": "webpack-dev-server"
   },
   "keywords": [
@@ -24,15 +24,15 @@
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.10.0",
     "style-loader": "^3.3.4",
-    "webpack": "^5.0.0",
+    "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.0.2"
+    "webpack-dev-server": "^5.0.4"
   },
   "dependencies": {
     "cytoscape": "^3.28.1",
     "cytoscape-dagre": "^2.5.0",
-    "document-viz-wasm": "file:wasm/pkg",
+    "document-viz-components-loader": "file:web-components/loader",
     "javascript-color-gradient": "^2.4.4",
-    "document-viz-components-loader": "file:web-components/loader"
+    "nama-document-viz-wasm": "file:wasm-pkg"
   }
 }

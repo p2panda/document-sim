@@ -1,9 +1,8 @@
 import { Component, Element, h, Prop, Listen } from '@stencil/core';
-// import { Document, Operation } from 'document-viz-wasm';
 import { initGraph, gradientArray } from '../../utils/utils';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
-import { Operation } from 'document-viz-wasm';
+import { Operation } from 'nama-document-viz-wasm';
 
 @Component({
   tag: 'nama-log-viz',

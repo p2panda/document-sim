@@ -1,5 +1,5 @@
 import { Component, Element, Host, h, Prop, EventEmitter, Event, Listen, State } from '@stencil/core';
-import { Document, Operation } from 'document-viz-wasm';
+import { Document, Operation } from 'nama-document-viz-wasm';
 
 @Component({
   tag: 'nama-peer',
@@ -161,15 +161,15 @@ export class NamaPeer {
     return (
       <Host>
         <div id="wrapper">
-        <h2 class={this.owner ? 'owner' : ''}>{this.author}</h2>
-        <nama-peer-controls
-          online={this.online}
-          latency={this.latency}
-          frequency={this.interval}
-          setOnline={value => (this.online = value)}
-          setLatency={value => (this.latency = value)}
-          setFrequency={value => (this.interval = value)}
-        ></nama-peer-controls>
+          <h2 class={this.owner ? 'owner' : ''}>{this.author}</h2>
+          <nama-peer-controls
+            online={this.online}
+            latency={this.latency}
+            frequency={this.interval}
+            setOnline={value => (this.online = value)}
+            setLatency={value => (this.latency = value)}
+            setFrequency={value => (this.interval = value)}
+          ></nama-peer-controls>
         </div>
       </Host>
     );

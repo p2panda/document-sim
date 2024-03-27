@@ -1,4 +1,4 @@
-import * as wasm from "document-viz-wasm";
+import * as wasm from "nama-document-viz-wasm";
 import { defineCustomElements } from "document-viz-components-loader";
 
 defineCustomElements();

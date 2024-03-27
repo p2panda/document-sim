@@ -5,8 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Document, Operation } from "document-viz-wasm";
-export { Document, Operation } from "document-viz-wasm";
+import { Document, Operation } from "nama-document-viz-wasm";
+export { Document, Operation } from "nama-document-viz-wasm";
 export namespace Components {
     interface NamaCaps {
     }
