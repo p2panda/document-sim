@@ -1,6 +1,6 @@
-# nama-document-viz
+# `namakemono` document visualizations
 
-visualize namakemono document simulations in the browser
+![screenshot of document graph simulation](/screenshot.png)
 
 ## dev
 
