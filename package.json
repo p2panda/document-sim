@@ -1,5 +1,5 @@
 {
-  "name": "nama-document-viz",
+  "name": "nama-document-sim",
   "version": "0.1.0",
   "description": "Visualize namakemono document simulations in the browser",
   "main": "index.js",

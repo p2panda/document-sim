@@ -1,7 +1,7 @@
 {
-  "name": "document-viz-components",
+  "name": "document-sim-components",
   "version": "0.0.1",
-  "description": "Namakemono document visualization web components",
+  "description": "Namakemono document simulation web components",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "es2015": "dist/esm/index.js",
@@ -9,7 +9,7 @@
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/document-viz-components/document-viz-components.esm.js",
+  "unpkg": "dist/document-sim-components/document-sim-components.esm.js",
   "files": [
     "dist/",
     "loader/"
