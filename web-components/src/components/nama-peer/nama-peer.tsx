@@ -35,7 +35,7 @@ export class NamaPeer {
 
   queue: Operation[] = new Array();
 
-  intervalID?: NodeJS.Timer;
+  intervalID?: any;
 
   @Event() namaSend: EventEmitter<{ peer: string; latency: number; operations: Operation[] }>;
 
