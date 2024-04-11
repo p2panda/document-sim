@@ -10,7 +10,7 @@ export class NamaPeerControls {
   @Prop() secs?: number = 10;
   @Prop() depthPerLog?: 4;
 
-  @State() pruneByTimestamp: boolean = false;
+  @State() pruneByTimestamp: boolean = true;
   @State() pruneByDepth: boolean = false;
   @State() pruneByDepthPerLog: boolean = false;
 
