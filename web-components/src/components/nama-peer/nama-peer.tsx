@@ -25,7 +25,7 @@ export class NamaPeer {
 
   pruneDepthPerLog?: number;
 
-  pruneBefore?: number;
+  pruneBefore?: number = 10000;
 
   nextPublishAt: number;
 
