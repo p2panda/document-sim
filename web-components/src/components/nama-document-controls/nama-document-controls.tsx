@@ -45,6 +45,14 @@ export class NamaPeerControls {
     });
   };
 
+  componentDidLoad() {
+    this.namaPruneConfig.emit({
+      depth: this.pruneByDepth ? this.depth : null,
+      depthPerLog: this.pruneByDepthPerLog ? this.depthPerLog : null,
+      ms: this.pruneByTimestamp ? this.secs * 1000 : null,
+    });
+  }
+
   render() {
     return (
       <Host>
