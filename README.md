@@ -19,3 +19,9 @@ npm run build
 # Run dev server
 npm run start
 ```
+
+## Supported by
+
+This work would not have been possible without the generous support of the [NLNet Foundation](https://nlnet.nl/) under the [NGI Zero Entrust](https://nlnet.nl/entrust/) funding scheme.
+
+<img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/nlnet-logo.svg" width="auto" height="80px"><br />
