@@ -10,7 +10,7 @@ Simulate p2panda documents and visualize changes:
 * documents can have different "pruning strategies" (the amount of history kept)
 * capabilities can be issued to give non-owner peers document access authorization 
 
-## dev
+## Development
 
 ```bash
 # Compile and bundle all web assets
