@@ -1,8 +1,9 @@
 # `p2panda` document simulator
 
+Live [here](https://p2panda.github.io/document-sim/)!
+
 ![screenshot of document graph simulation](/screenshot.png)
 
-Live [here](https://p2panda.github.io/document-sim/)!
 
 Simulate p2panda documents and visualize changes:
 * peers publish operations at different frequencies and with different network latencies
