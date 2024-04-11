@@ -1,4 +1,4 @@
-# `namakemono` document simulator
+# `p2panda` document simulator
 
 ![screenshot of document graph simulation](/screenshot.png)
 
